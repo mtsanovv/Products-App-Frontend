@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
-    <title>Add a product</title>
+    <title>Editing product: </title>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
     <script src="../scripts/config.js"></script>
     <script src="../scripts/products.js"></script>
 </head>
-<body style="text-align: center;">
-    <h1>Add a product</h1>
+<body style="text-align: center;" onload="editingPageLoaded()">
+    <h1 id="editingPageTitle"></h1>
     <h4 id="errorMessage"></h4>
-    <table>
+    <table id="productsListing">
         <thead>
             <tr>
                 <th>Name</th>
@@ -36,6 +36,6 @@
             </tr>
         </tbody>
     </table>
-    <button onclick="addProduct()">Submit</button> <a href="index.html"><button>Cancel adding</button></a>
+    <button id="saveChanges">Save changes</button> <a id="cancelEditing" href="index.html"><button>Cancel editing</button></a>
 </body>
 </html>

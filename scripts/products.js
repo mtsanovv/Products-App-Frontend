@@ -14,6 +14,29 @@ function fetchProducts()
     });
 }
 
+//setting up the product editing page
+function editingPageLoaded()
+{
+    $.ajax({
+        type: 'GET',
+        url: APIConfig.host + '/products/' + getUrlParameter("product"),
+        success: function (result) {
+            document.title = "Editing product '" + result.product.name + "'";
+            $("#editingPageTitle").text("Editing product '" + result.product.name + "'");
+            $("#name").val(result.product.name);
+            $("#quantity").val(result.product.quantity);
+            $("#criticalQuantity").val(result.product.criticalQuantity);
+            $("#pricePerItem").val(result.product.pricePerItem);
+            $("#saveChanges").attr("onclick", "saveProduct(" + result.product.id + ")");
+        },
+        error: function(xhr, status, code) {
+            showProductsError(xhr, status, code);
+            $("#saveChanges").hide();
+            $("#cancelEditing").hide();
+        }
+    });
+}
+
 //function to send a POST request to add the product
 function addProduct()
 {
@@ -82,15 +105,18 @@ function saveProduct(productId)
             data: JSON.stringify(dataToBeSent),
             contentType: "application/json",
             success: function (result) {
-                $("body").html(result);
+                window.location.href="index.html"
             },
-            error: function (e) {
-                $("body").html(e.responseText);
+            error: function (xhr, status, error)
+            {
+                showProductsError(xhr, status, error);
+                $("#productsListing").show();
             }
         });
     }
 }
 
+//function to show the products listing
 function showProductsListing(result)
 {
     $("#errorMessage").hide();
@@ -108,11 +134,12 @@ function showProductsListing(result)
         row.forEach((element) => {
             $("#productsTableRows").append("<td>" + element + "</td>");
         });
-        $("#productsTableRows").append("<td><a href='" + row[0] + "'><button>Edit</button></a> <button onclick='deleteProduct(" + row[0] + ")'>Delete</button></td>");
+        $("#productsTableRows").append("<td><a href='edit.html?product=" + row[0] + "'><button>Edit</button></a> <button onclick='deleteProduct(" + row[0] + ")'>Delete</button></td>");
         $("#productsTableRows").append("</tr>");
     });
 }
 
+//showing errors for products
 function showProductsError(xhr, status, error)
 {
     $("#errorMessage").show();
@@ -122,3 +149,22 @@ function showProductsError(xhr, status, error)
 
     $("#errorMessage").append(JSON.parse(xhr.responseText).message);
 }
+
+//function to get url parameter
+function getUrlParameter(sParam) 
+{
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) 
+    {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) 
+        {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+};
