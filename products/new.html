@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Add a product</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="../scripts/config.js"></script>
+    <script src="../scripts/products.js"></script>
+</head>
+<body style="text-align: center;">
+    <h1>Add a product</h1>
+    <h4 id="errorMessage"></h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Critical quantity</th>
+                <th>Price per item (BGN)</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>
+                    <input id="name" name="name" type="text" pattern="^.{1,}$" required></input>
+                </td>
+                <td>
+                    <input id="quantity" name="quantity" type="text" pattern="^\d{1,}$" required></input>
+                </td>
+                <td>
+                    <input id="criticalQuantity" name="criticalQuantity" type="text" pattern="^\d{1,}$" required></input>
+                </td>
+                <td>
+                    <input id="pricePerItem" name="pricePerItem" type="text" pattern="^[0-9]{1,10}\.[0-9]{1,4}$" required></input>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button onclick="addProduct()">Submit</button> <a href="index.html"><button>Cancel adding</button></a>
+</body>
+</html>
