@@ -75,7 +75,9 @@ function deleteProduct(productId)
     $.ajax({
         type: 'DELETE',
         url: APIConfig.host + '/products/' + productId,
-        success: showProductsListing,
+        success: function(result) {
+            location.reload();
+        },
         error: showProductsError
     });
 }
@@ -124,11 +126,10 @@ function showProductsListing(result)
     $("#errorMessage").hide();
     $("#productsListing").show();
 
-    $("#productsTableRows").html("");
-
     columnHeaders.forEach((header) => {
         $("#productsTableHeaders").append("<th>" + header + "</th>");
     });
+
     result.forEach((row) => {
         $("#productsTableRows").append("<tr>");
         row.forEach((element) => {

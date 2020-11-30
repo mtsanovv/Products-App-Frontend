@@ -53,11 +53,11 @@ function editingPageLoaded()
         type: 'GET',
         url: APIConfig.host + '/merchants/' + getUrlParameter("merchant"),
         success: function (result) {
-            document.title = "Editing merchant '" + result.merchant.displayName + "'";
-            $("#editingPageTitle").text("Editing merchant '" + result.merchant.displayName + "'");
-            $("#username").val(result.merchant.username);
-            $("#displayName").val(result.merchant.displayName);
-            $("#saveChanges").attr("onclick", "saveMerchant(" + result.merchant.id + ")");
+            document.title = "Editing merchant '" + result.displayName + "'";
+            $("#editingPageTitle").text("Editing merchant '" + result.displayName + "'");
+            $("#username").val(result.username);
+            $("#displayName").val(result.displayName);
+            $("#saveChanges").attr("onclick", "saveMerchant(" + result.id + ")");
         },
         error: function(xhr, status, code) {
             showMerchantsError(xhr, status, code);
@@ -73,7 +73,9 @@ function deleteMerchant(merchantId)
     $.ajax({
         type: 'DELETE',
         url: APIConfig.host + '/merchants/' + merchantId,
-        success: showMerchantsListing,
+        success: function(result) {
+            location.reload();
+        },
         error: showMerchantsError
     });
 }
@@ -117,17 +119,16 @@ function saveMerchant(merchantId)
 //function to show the merchants listing
 function showMerchantsListing(result)
 {
+    const columnHeaders = ["ID", "Username", "Display name", "Actions"];
+
     $("#errorMessage").hide();
     $("#merchantsListing").show();
 
-    $("#merchantsTableHeaders").html("");
-    $("#merchantsTableRows").html("");
-
-    result.headers.forEach((header) => {
+    columnHeaders.forEach((header) => {
         $("#merchantsTableHeaders").append("<th>" + header + "</th>");
     });
-    $("#merchantsTableHeaders").append("<th>Actions</th>");
-    result.rows.forEach((row) => {
+
+    result.forEach((row) => {
         $("#merchantsTableRows").append("<tr>");
         row.forEach((element) => {
             $("#merchantsTableRows").append("<td>" + element + "</td>");
