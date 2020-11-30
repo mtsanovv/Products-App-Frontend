@@ -86,7 +86,7 @@ function saveMerchant(merchantId)
     let inputValidationsPassed = 0;
 
     $('input').each(function(index, item) {
-        if(item.checkValidity() || (item.id === "password" && item.value))
+        if(item.checkValidity() || (item.id === "password" && !item.value))
             inputValidationsPassed++;
     });
 
