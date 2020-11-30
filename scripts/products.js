@@ -21,13 +21,13 @@ function editingPageLoaded()
         type: 'GET',
         url: APIConfig.host + '/products/' + getUrlParameter("product"),
         success: function (result) {
-            document.title = "Editing product '" + result.product.name + "'";
-            $("#editingPageTitle").text("Editing product '" + result.product.name + "'");
-            $("#name").val(result.product.name);
-            $("#quantity").val(result.product.quantity);
-            $("#criticalQuantity").val(result.product.criticalQuantity);
-            $("#pricePerItem").val(result.product.pricePerItem);
-            $("#saveChanges").attr("onclick", "saveProduct(" + result.product.id + ")");
+            document.title = "Editing product '" + result.name + "'";
+            $("#editingPageTitle").text("Editing product '" + result.name + "'");
+            $("#name").val(result.name);
+            $("#quantity").val(result.quantity);
+            $("#criticalQuantity").val(result.criticalQuantity);
+            $("#pricePerItem").val(result.pricePerItem);
+            $("#saveChanges").attr("onclick", "saveProduct(" + result.id + ")");
         },
         error: function(xhr, status, code) {
             showProductsError(xhr, status, code);
@@ -119,17 +119,17 @@ function saveProduct(productId)
 //function to show the products listing
 function showProductsListing(result)
 {
+    const columnHeaders = ["ID", "Name", "Quantity", "Critical quantity", "Price per item (BGN)", "Actions"];
+
     $("#errorMessage").hide();
     $("#productsListing").show();
 
-    $("#productsTableHeaders").html("");
     $("#productsTableRows").html("");
 
-    result.headers.forEach((header) => {
+    columnHeaders.forEach((header) => {
         $("#productsTableHeaders").append("<th>" + header + "</th>");
     });
-    $("#productsTableHeaders").append("<th>Actions</th>");
-    result.rows.forEach((row) => {
+    result.forEach((row) => {
         $("#productsTableRows").append("<tr>");
         row.forEach((element) => {
             $("#productsTableRows").append("<td>" + element + "</td>");
