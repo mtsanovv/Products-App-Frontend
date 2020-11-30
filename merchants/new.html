@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Add a product</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="../scripts/config.js"></script>
+    <script src="../scripts/merchants.js"></script>
+</head>
+<body style="text-align: center;">
+    <h1>Add a merchant</h1>
+    <h4 id="errorMessage"></h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Username (up to 128 characters)</th>
+                <th>Display name (up to 1024 characters)</th>
+                <th>Password (between 8 and 50 characters)</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>
+                    <input id="username" name="username" type="text" pattern="^.{1,128}$"></input>
+                </td>
+                <td>
+                    <input id="displayName" name="displayName" type="text" pattern="^.{1,1024}$"></input>
+                </td>
+                <td>
+                    <input id="password" name="password" type="password" pattern="^.{8,50}$"></input>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button onclick="addMerchant()">Submit</button> <a href="index.html"><button>Cancel adding</button></a>
+</body>
+</html>
