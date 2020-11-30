@@ -12,9 +12,9 @@
     <table id="productsListing">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Quantity</th>
-                <th>Critical quantity</th>
+                <th>Name (up to 1024 characters)</th>
+                <th>Quantity (up to 20 digits)</th>
+                <th>Critical quantity (up to 20 digits)</th>
                 <th>Price per item (BGN)</th>
             </tr>
         </thead>
@@ -22,13 +22,13 @@
         <tbody>
             <tr>
                 <td>
-                    <input id="name" name="name" type="text" pattern="^.{1,}$"></input>
+                    <input id="name" name="name" type="text" pattern="^.{1,1024}$"></input>
                 </td>
                 <td>
-                    <input id="quantity" name="quantity" type="text" pattern="^\d{1,}$"></input>
+                    <input id="quantity" name="quantity" type="text" pattern="^\d{1,20}$"></input>
                 </td>
                 <td>
-                    <input id="criticalQuantity" name="criticalQuantity" type="text" pattern="^\d{1,}$"></input>
+                    <input id="criticalQuantity" name="criticalQuantity" type="text" pattern="^\d{1,20}$"></input>
                 </td>
                 <td>
                     <input id="pricePerItem" name="pricePerItem" type="text" pattern="^[0-9]{1,10}\.[0-9]{1,4}$"></input>
