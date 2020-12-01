@@ -3,11 +3,19 @@ $('input').blur(function(evt) {
     evt.target.checkValidity();
 });
 
+//redirect to the login page if the user is not logged in
+if(!getCookie(APIConfig.sessionCookie))
+    window.location.href = "../login.html";
+
 //function to fetch all products from the Rest API
 function fetchProducts()
 {
     $.ajax({
         type: 'GET',
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
         url: APIConfig.host + '/products',
         success: showProductsListing,
         error: showProductsError
@@ -19,6 +27,10 @@ function editingPageLoaded()
 {
     $.ajax({
         type: 'GET',
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
         url: APIConfig.host + '/products/' + getUrlParameter("product"),
         success: function (result) {
             document.title = "Editing product '" + result.name + "'";
@@ -58,11 +70,15 @@ function addProduct()
 
         $.ajax({
             type: 'POST',
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
             url: APIConfig.host + '/products',
             data: JSON.stringify(dataToBeSent),
             contentType: "application/json",
             success: function (result) {
-                window.location.href="index.html"
+                window.location.href = "index.html"
             },
             error: showProductsError
         });
@@ -74,6 +90,10 @@ function deleteProduct(productId)
 {
     $.ajax({
         type: 'DELETE',
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
         url: APIConfig.host + '/products/' + productId,
         success: function(result) {
             location.reload();
@@ -103,11 +123,15 @@ function saveProduct(productId)
 
         $.ajax({
             type: 'PUT',
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
             url: APIConfig.host + '/products/' + productId,
             data: JSON.stringify(dataToBeSent),
             contentType: "application/json",
             success: function (result) {
-                window.location.href="index.html"
+                window.location.href = "index.html"
             },
             error: function (xhr, status, error)
             {
@@ -149,7 +173,10 @@ function showProductsError(xhr, status, error)
 
     $("#errorMessage").html("");
 
-    $("#errorMessage").append(JSON.parse(xhr.responseText).message);
+    if(xhr.status == 403 || xhr.status == 401)
+        $("#errorMessage").append("You are not allowed to access this page");
+    else
+        $("#errorMessage").append(JSON.parse(xhr.responseText).message);
 }
 
 //function to get url parameter

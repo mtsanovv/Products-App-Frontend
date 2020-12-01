@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Log in TechStore</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="scripts/config.js"></script>
+    <script src="scripts/cookies.js"></script>
+    <script src="scripts/login.js"></script>
+</head>
+<body style="text-align: center;">
+    <h1>Login</h1>
+    <h4 id="errorMessage"></h4>
+    
+    <input id="username" name="username" type="text" pattern="^.{1,128}$" required></input>
+    <input id="password" name="password" type="password" pattern="^.{8,50}$" required></input>
+    <button onclick="attemptLogin()">Log In</button>
+</body>
+</html>

@@ -3,11 +3,19 @@ $('input').blur(function(evt) {
     evt.target.checkValidity();
 });
 
+//redirect to the login page if the user is not logged in
+if(!getCookie(APIConfig.sessionCookie))
+    window.location.href = "../login.html";
+
 //function to fetch all merchants from the Rest API
 function fetchMerchants()
 {
     $.ajax({
         type: 'GET',
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
         url: APIConfig.host + '/merchants',
         success: showMerchantsListing,
         error: showMerchantsError
@@ -34,11 +42,15 @@ function addMerchant()
 
         $.ajax({
             type: 'POST',
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
             url: APIConfig.host + '/merchants',
             data: JSON.stringify(dataToBeSent),
             contentType: "application/json",
             success: function (result) {
-                window.location.href="index.html"
+                window.location.href = "index.html"
             },
             error: showMerchantsError
         });
@@ -51,6 +63,10 @@ function editingPageLoaded()
 {
     $.ajax({
         type: 'GET',
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
         url: APIConfig.host + '/merchants/' + getUrlParameter("merchant"),
         success: function (result) {
             document.title = "Editing merchant '" + result.displayName + "'";
@@ -72,6 +88,10 @@ function deleteMerchant(merchantId)
 {
     $.ajax({
         type: 'DELETE',
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
         url: APIConfig.host + '/merchants/' + merchantId,
         success: function(result) {
             location.reload();
@@ -100,11 +120,15 @@ function saveMerchant(merchantId)
 
         $.ajax({
             type: 'PUT',
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
             url: APIConfig.host + '/merchants/' + merchantId,
             data: JSON.stringify(dataToBeSent),
             contentType: "application/json",
             success: function (result) {
-                window.location.href="index.html"
+                window.location.href = "index.html"
             },
             error: function (xhr, status, error)
             {
@@ -149,7 +173,10 @@ function showMerchantsError(xhr, status, error)
 
     $("#errorMessage").html("");
 
-    $("#errorMessage").append(JSON.parse(xhr.responseText).message);
+    if(xhr.status == 403 || xhr.status == 401)
+        $("#errorMessage").append("You are not allowed to access this page");
+    else
+        $("#errorMessage").append(JSON.parse(xhr.responseText).message);
 }
 
 //function to get url parameter
