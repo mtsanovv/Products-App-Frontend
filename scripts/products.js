@@ -160,7 +160,7 @@ function showProductsListing(result)
         for (const [key, element] of Object.entries(row))
             $("#productsTableRows").append("<td>" + element + "</td>");
 
-        $("#productsTableRows").append("<td><a href='edit.html?product=" + row.id + "'><button>Edit</button></a> <button onclick='deleteProduct(" + row[0] + ")'>Delete</button></td>");
+        $("#productsTableRows").append("<td><a href='edit.html?product=" + row.id + "'><button>Edit</button></a> <button onclick='deleteProduct(" + row.id + ")'>Delete</button></td>");
         $("#productsTableRows").append("</tr>");
     });
 }

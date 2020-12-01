@@ -160,7 +160,7 @@ function showMerchantsListing(result)
                 $("#merchantsTableRows").append("<td>" + element + "</td>");
         }
 
-        $("#merchantsTableRows").append("<td><a href='edit.html?merchant=" + row.id + "'><button>Edit</button></a> <button onclick='deleteMerchant(" + row[0] + ")'>Delete</button></td>");
+        $("#merchantsTableRows").append("<td><a href='edit.html?merchant=" + row.id + "'><button>Edit</button></a> <button onclick='deleteMerchant(" + row.id + ")'>Delete</button></td>");
         $("#merchantTableRows").append("</tr>");
     });
 }
