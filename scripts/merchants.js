@@ -130,10 +130,13 @@ function showMerchantsListing(result)
 
     result.forEach((row) => {
         $("#merchantsTableRows").append("<tr>");
-        row.forEach((element) => {
-            $("#merchantsTableRows").append("<td>" + element + "</td>");
-        });
-        $("#merchantsTableRows").append("<td><a href='edit.html?merchant=" + row[0] + "'><button>Edit</button></a> <button onclick='deleteMerchant(" + row[0] + ")'>Delete</button></td>");
+        for (const [key, element] of Object.entries(row))
+        {
+            if(key != "password" && key != "rank")
+                $("#merchantsTableRows").append("<td>" + element + "</td>");
+        }
+
+        $("#merchantsTableRows").append("<td><a href='edit.html?merchant=" + row.id + "'><button>Edit</button></a> <button onclick='deleteMerchant(" + row[0] + ")'>Delete</button></td>");
         $("#merchantTableRows").append("</tr>");
     });
 }

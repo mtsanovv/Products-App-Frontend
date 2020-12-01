@@ -132,10 +132,11 @@ function showProductsListing(result)
 
     result.forEach((row) => {
         $("#productsTableRows").append("<tr>");
-        row.forEach((element) => {
+
+        for (const [key, element] of Object.entries(row))
             $("#productsTableRows").append("<td>" + element + "</td>");
-        });
-        $("#productsTableRows").append("<td><a href='edit.html?product=" + row[0] + "'><button>Edit</button></a> <button onclick='deleteProduct(" + row[0] + ")'>Delete</button></td>");
+
+        $("#productsTableRows").append("<td><a href='edit.html?product=" + row.id + "'><button>Edit</button></a> <button onclick='deleteProduct(" + row[0] + ")'>Delete</button></td>");
         $("#productsTableRows").append("</tr>");
     });
 }
