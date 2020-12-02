@@ -3,9 +3,18 @@ $('input').blur(function(evt) {
     evt.target.checkValidity();
 });
 
-//redirect to the dashboard if the user is logged in
-if(getCookie(APIConfig.sessionCookie))
-    window.location.href = "dashboard.html";
+//check if the user is logged in
+$.ajax({
+    type: 'GET',
+    xhrFields: {
+        withCredentials: true
+    },
+    crossDomain: true,
+    url: APIConfig.host + '/user',
+    success: function(result) {
+        window.location.href = "dashboard.html";
+    }
+});
 
 
 function attemptLogin()
