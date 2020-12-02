@@ -39,10 +39,8 @@ function attemptLogin()
 
                 $("#errorMessage").html("");
 
-                if(xhr.status == 403 || xhr.status == 401)
-                {
+                if(xhr.status == 401)
                     $("#errorMessage").append("Invalid username or password");
-                }
             }
         });
     }
