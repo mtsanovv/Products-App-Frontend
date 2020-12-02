@@ -144,6 +144,7 @@ function saveMerchant(merchantId)
 function showMerchantsListing(result)
 {
     const columnHeaders = ["ID", "Username", "Display name", "Actions"];
+    const ignoreParameters = ["password", "rank", "clients"];
 
     $("#errorMessage").hide();
     $("#merchantsListing").show();
@@ -156,7 +157,7 @@ function showMerchantsListing(result)
         $("#merchantsTableRows").append("<tr>");
         for (const [key, element] of Object.entries(row))
         {
-            if(key != "password" && key != "rank")
+            if(ignoreParameters.indexOf(key) == -1)
                 $("#merchantsTableRows").append("<td>" + element + "</td>");
         }
 
