@@ -177,8 +177,10 @@ function showClientsError(xhr, status, error)
 
     $("#errorMessage").html("");
 
-    if(xhr.status == 403 || xhr.status == 401)
-        $("#errorMessage").append("You are not allowed to access this page");
+    if(xhr.status == 401)
+        window.location.href = "../login.html";
+    else if(xhr.status == 403)
+        window.location.href = "../dashboard.html";
     else
         $("#errorMessage").append(JSON.parse(xhr.responseText).message);
 }
