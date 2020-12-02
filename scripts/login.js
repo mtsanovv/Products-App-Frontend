@@ -30,8 +30,7 @@ function attemptLogin()
                 xhr.setRequestHeader ("Authorization", "Basic " + btoa(document.getElementById("username").value + ":" + document.getElementById("password").value));
             },
             success: function (result) {
-                setSessionCookie(APIConfig.sessionCookie, "true");
-                window.location.href = "dashboard.html"
+                window.location.href = "dashboard.html";
             },
             error: function (xhr, status, error)
             {
@@ -40,7 +39,9 @@ function attemptLogin()
                 $("#errorMessage").html("");
 
                 if(xhr.status == 401)
-                    $("#errorMessage").append("Invalid username or password");
+                    $("#errorMessage").append("Invalid username or password.");
+                else
+                    $("#errorMessage").append("An error has occurred. Please try again later.");
             }
         });
     }

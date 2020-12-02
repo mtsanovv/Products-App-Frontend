@@ -1,5 +1,16 @@
-//redirect to dashboard if the user is logged in, else ask them to log in
-if(getCookie(APIConfig.sessionCookie))
-    window.location.href = "dashboard.html";
-else
-    window.location.href = "login.html"
+//check if the user is logged in
+$.ajax({
+    type: 'GET',
+    xhrFields: {
+        withCredentials: true
+    },
+    crossDomain: true,
+    url: APIConfig.host + '/user',
+    success: function(result) {
+        window.location.href = "dashboard.html";
+    },
+    error: function(xhr) {
+        if(xhr.status == 401)
+            window.location.href = "login.html";
+    }
+});

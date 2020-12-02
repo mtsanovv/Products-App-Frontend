@@ -3,9 +3,21 @@ $('input').blur(function(evt) {
     evt.target.checkValidity();
 });
 
-//redirect to the login page if the user is not logged in
-if(!getCookie(APIConfig.sessionCookie))
-    window.location.href = "../login.html";
+//check if the user is logged in
+$.ajax({
+    type: 'GET',
+    xhrFields: {
+        withCredentials: true
+    },
+    crossDomain: true,
+    url: APIConfig.host + '/user',
+    error: function(xhr) {
+        if(xhr.status == 401)
+            window.location.href = "../login.html";
+        else 
+            window.location.href = "../dashboard.html";
+    }
+});
 
 //function to fetch all merchants from the Rest API
 function fetchMerchants()
