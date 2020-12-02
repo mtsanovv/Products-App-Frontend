@@ -162,7 +162,7 @@ function showMerchantsListing(result)
         }
 
         $("#merchantsTableRows").append("<td><a href='edit.html?merchant=" + row.id + "'><button>Edit</button></a> <button onclick='deleteMerchant(" + row.id + ")'>Delete</button></td>");
-        $("#merchantTableRows").append("</tr>");
+        $("#merchantsTableRows").append("</tr>");
     });
 }
 
