@@ -156,7 +156,7 @@ function saveMerchant(merchantId)
 function showMerchantsListing(result)
 {
     const columnHeaders = ["ID", "Username", "Display name", "Actions"];
-    const ignoreParameters = ["password", "rank", "clients"];
+    const ignoreParameters = ["password", "rank", "clients", "sales"];
 
     $("#errorMessage").hide();
     $("#merchantsListing").show();
