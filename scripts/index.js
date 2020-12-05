@@ -10,7 +10,6 @@ $.ajax({
         window.location.href = "dashboard.html";
     },
     error: function(xhr) {
-        if(xhr.status == 401)
-            window.location.href = "login.html";
+        window.location.href = "login.html";
     }
 });
