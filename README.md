@@ -6,7 +6,7 @@ Frontend UI for the Java Spring REST app that has to maintain users and products
 - MDB Pro v4.8.10 (not provided with this repository as it is out of the License Agreement with MDBoostrap)
 
 ## Configuring the frontend
-- Place the MDB Pro v4.8.10 assets inside the mdb folder (css, js and other stuff).
+- Place the MDB Pro v4.8.10 assets inside the mdb folder (css, js, font and all the other folders).
 - Go to the ```scripts``` directory and edit the ```config.js``` file to point to the TechStore REST API.
 
 ## Notes
