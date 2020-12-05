@@ -16,6 +16,11 @@ $.ajax({
     }
 });
 
+function loginFormLoaded()
+{
+    $("#errorMessage").hide();
+}
+
 
 function attemptLogin()
 {
@@ -23,7 +28,20 @@ function attemptLogin()
 
     $('input').each(function(index, item) {
         if(item.checkValidity())
+        {
             inputValidationsPassed++;
+            $("#" + item.id).removeClass("invalid");
+            $("#" + item.id).removeClass("valid");
+            $("#" + item.id).focusin();
+            $("#" + item.id).addClass("valid");
+        }
+        else
+        {
+            $("#" + item.id).removeClass("invalid");
+            $("#" + item.id).removeClass("valid");
+            $("#" + item.id).focusin();
+            $("#" + item.id).addClass("invalid");
+        }
     });
 
     if(inputValidationsPassed === $('input').length)

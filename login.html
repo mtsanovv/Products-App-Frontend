@@ -1,17 +1,196 @@
 <!DOCTYPE html>
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Log in TechStore</title>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-    <script src="scripts/config.js"></script>
-    <script src="scripts/login.js"></script>
+  <!-- Required meta tags always come first -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Log in TechStore</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+  <!-- Bootstrap core CSS -->
+  <link href="mdb/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Material Design Bootstrap -->
+  <link href="mdb/css/mdb.min.css" rel="stylesheet">
+
+  <!--  SCRIPTS  -->
+  <!-- JQuery -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+  <!-- Bootstrap tooltips -->
+  <script type="text/javascript" src="mdb/js/popper.min.js"></script>
+  <!-- Bootstrap core JavaScript -->
+  <script type="text/javascript" src="mdb/js/bootstrap.min.js"></script>
+  <!-- MDB core JavaScript -->
+  <script type="text/javascript" src="mdb/js/mdb.min.js"></script>
+  <!-- REST API Config -->
+  <script src="scripts/config.js"></script>
+  <!-- Login page script -->
+  <script src="scripts/login.js"></script>
+
+  <style>
+
+    html,
+        body,
+        header,
+        .view {
+          height: 100vh;
+        }
+
+        @media (max-width: 740px) {
+          html,
+          body,
+          header,
+          .view {
+            height: 815px;
+          }
+        }
+
+        @media (min-width: 800px) and (max-width: 850px) {
+          html,
+          body,
+          header,
+          .view  {
+            height: 650px;
+          }
+        }
+
+        .intro-2 {
+            background: url("assets/images/loginbg.jpeg")no-repeat center center;
+            background-size: cover;
+        }
+        .top-nav-collapse {
+            background-color: #3f51b5 !important;
+        }
+        .navbar:not(.top-nav-collapse) {
+            background: transparent !important;
+        }
+        @media (max-width: 768px) {
+            .navbar:not(.top-nav-collapse) {
+                background: #3f51b5 !important;
+            }
+        }
+        @media (min-width: 800px) and (max-width: 850px) {
+            .navbar:not(.top-nav-collapse) {
+                background: #3f51b5!important;
+            }
+        }
+
+        .card {
+            background-color: rgba(229, 228, 255, 0.2);
+        }
+        .md-form label {
+            color: #ffffff;
+        }
+        h6 {
+            line-height: 1.7;
+        }
+
+
+        .card {
+            margin-top: 30px;
+            /*margin-bottom: -45px;*/
+
+        }
+
+        .md-form input[type=text]:focus:not([readonly]),
+        .md-form input[type=password]:focus:not([readonly]) {
+            border-bottom: 1px solid #8EDEF8;
+            box-shadow: 0 1px 0 0 #8EDEF8;
+        }
+        .md-form input[type=text]:focus:not([readonly])+label,
+        .md-form input[type=password]:focus:not([readonly])+label {
+            color: #8EDEF8;
+        }
+
+        .md-form .form-control {
+            color: #fff;
+        }
+
+        input[type=text]:focus:not([readonly]) + label {
+            color: #8EDEF8 !important; 
+        }
+
+        input[type=password]:focus:not([readonly]) + label {
+            color: #8EDEF8 !important; 
+        }
+
+        input[type=text]:focus:not([readonly]) {
+            border-bottom: 1px solid #8EDEF8 !important;
+            box-shadow: 0 1px 0 0  #8EDEF8 !important; 
+        }
+
+        input[type=password]:focus:not([readonly]) {
+            border-bottom: 1px solid #8EDEF8 !important;
+            box-shadow: 0 1px 0 0  #8EDEF8 !important; 
+        }
+
+        input[type=password]:focus:not([readonly]) + invalid {
+            color: #8EDEF8 !important; 
+        }
+
+    </style>
+
 </head>
-<body style="text-align: center;">
-    <h1>Login</h1>
-    <h4 id="errorMessage"></h4>
-    
-    <input id="username" name="username" type="text" pattern="^.{1,128}$" required></input>
-    <input id="password" name="password" type="password" pattern="^.{8,50}$" required></input>
-    <button onclick="attemptLogin()">Log In</button>
+
+<body onload="loginFormLoaded()">
+
+
+  <!--Main Navigation-->
+  <header>
+
+    <!--Intro Section-->
+    <section class="view intro-2">
+      <div class="mask rgba-stylish-strong h-100 d-flex justify-content-center align-items-center">
+        <div class="container">
+          <div class="row">
+            <div class="col-xl-5 col-lg-6 col-md-10 col-sm-12 mx-auto mt-lg-5">
+
+              <!--Form with header-->
+              <div class="card wow fadeIn" data-wow-delay="0.3s">
+                <div class="card-body">
+
+                  <!--Header-->
+                  <div class="form-header blue-gradient">
+                    <h3>Log in TechStore</h3>
+                  </div>
+
+                  <div class="alert alert-danger" id="errorMessage" role="alert" style="text-align: center !important;"></div>
+
+                  <!--Body-->
+                  <div class="md-form">
+                    <i class="fas fa-user prefix white-text"></i>
+                    <input type="text" id="username" name="username" class="form-control validate" pattern="^.{1,128}$" required></input>
+                    <label for="username" data-error="invalid">Username</label>
+                  </div>
+
+                  <div class="md-form">
+                    <i class="fas fa-lock prefix white-text"></i>
+                    <input type="password" id="password" name="password" class="form-control validate" pattern="^.{8,50}$" required></input>
+                    <label for="password" data-error="invalid">Password</label>
+                  </div>
+
+                  <div class="text-center">
+                    <button onclick="attemptLogin()" class="btn btn-rounded blue-gradient btn-lg">Log In</button>
+                  </div>
+
+                </div>
+              </div>
+              <!--/Form with header-->
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </header>
+  <!--Main Navigation-->
+  <script>
+    new WOW().init();
+
+  </script>
 </body>
+
 </html>
