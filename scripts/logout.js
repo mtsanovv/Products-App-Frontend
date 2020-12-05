@@ -20,7 +20,11 @@ function logoutUser()
                 window.location.href = "login.html";
             }
             else 
+            {
+                $("#logoutMessage").removeClass("alert-primary");
+                $("#logoutMessage").addClass("alert-danger");
                 $("#logoutMessage").text("An error has occurred during the log out procedure.");
+            }
         }
     });
 }
