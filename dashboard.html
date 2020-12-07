@@ -48,6 +48,22 @@
     #products, #merchants, #clients, #sales-admin, #sales-merchant {
       display: none;
     }
+
+    .ash-gradient {
+      background: linear-gradient(to left, #3f4c6b, #606c88) !important; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+
+    .pinot-noir-gradient {
+      background: linear-gradient(to left, #182848, #4b6cb7) !important; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    }
+
+    .calm-darya-gradient {
+      background: #5f2c82;  /* fallback for old browsers */
+      background: -webkit-linear-gradient(to right, #499dfd, #034ec0);  /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(to right, #499dfd, #034ec0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    }
   </style>
 </head>
 
@@ -172,7 +188,7 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle waves-effect" href="#" id="userDropdown" data-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false">
-              <i class="fas fa-user"></i> <span class="clearfix d-none d-sm-inline-block">Profile</span>
+              <i class="fas fa-user"></i> <span id="profileDropdown" class="clearfix d-none d-sm-inline-block">Profile</span>
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
               <a class="dropdown-item" href="logout.html">Log Out</a>
@@ -194,7 +210,67 @@
   <!-- Main layout -->
   <main>
 
-    <div class="container-fluid">
+    <div class="container-fluid wow fadeIn">
+
+      <!-- Section: User Panel -->
+      <section class="mt-md-4 pt-md-2 mb-5">
+
+        <!-- Card -->
+        <div class="card card-cascade narrower">
+
+          <!-- Section: User data -->
+          <section>
+
+            <!-- Grid row -->
+            <div class="row">
+
+              <!-- Grid column -->
+              <div class="col-xl-5 col-md-12 mr-0">
+
+                <!-- Card header -->
+                <div class="view view-cascade gradient-card-header blue-gradient">
+                  <h2 id="rankText" class="h2-responsive mb-0 font-weight-bold">Profile</h2>
+                </div>
+                <!-- Card header -->
+
+              </div>
+
+            </div>
+
+            <!-- Grid row -->
+            <div class="row">
+
+                <!-- Card body column -->
+                <div class="card-body card-body-cascade pb-3 col-md-8 offset-md-2">
+
+                  <!-- Welcome card -->
+                  <div id="welcomeCard" class="card calm-darya-gradient text-center">
+                    <div class="card-body">
+                      <h3 id="welcomeText" class="white-text mb-0">Welcome to TechStore, </h3>
+                    </div>
+                  </div>
+                  <!-- Welcome card -->
+
+                </div>
+                <!-- Card body -->
+
+            </div>
+            <!-- Grid row -->
+
+            <!-- Grid row -->
+            <div class="row">
+              <!-- Grid column -->
+              <div class="col-md-6 offset-md-3 text-center pt-3 pb-3">
+                  <h1 id="clockTime"></h1>
+                  <h2 id="dateTime" class="pt-3"></h2>
+              </div>
+            </div>
+            <!-- Grid row -->
+            
+          </section>
+        </div>
+
+      </section>
 
     </div>
 
@@ -202,7 +278,7 @@
   <!-- Main layout -->
 
   <!-- Footer -->
-  <footer class="page-footer pt-0 mt-5 rgba-stylish-light">
+  <footer class="page-footer pt-0 mt-5 rgba-stylish-light fixed-bottom wow fadeIn">
 
     <!-- Copyright -->
     <div class="footer-copyright py-3 text-center">
@@ -252,6 +328,8 @@
         toggleThemeMode(true);
       });
     });
+
+    new WOW().init();
   </script>
 
 </body>

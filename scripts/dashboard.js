@@ -1,3 +1,6 @@
+let pageLoaded = false;
+let serverResponse;
+
 //check if the user is logged in
 $.ajax({
     type: 'GET',
@@ -6,6 +9,11 @@ $.ajax({
     },
     crossDomain: true,
     url: APIConfig.host + '/user',
+    success: function(result) {
+        serverResponse = result;
+        if(pageLoaded)
+            establishUser();
+    },
     error: function(xhr) {
         if(xhr.status == 401)
             window.location.href = "login.html";
@@ -14,9 +22,46 @@ $.ajax({
 
 function dashboardPageLoaded() 
 {
+    pageLoaded = true;
     //switch to the theme mode accordingly
     if(getCookie("techstoreDashboardMode") == "dark")
         toggleThemeMode(false);
+    
+    //establish an authenticated user
+    if(serverResponse)
+        establishUser();
+
+    clockUpdate();
+    setInterval(clockUpdate, 1000);
+}
+
+function clockUpdate()
+{
+    let date = new Date();
+    $("#clockTime").text(new Intl.DateTimeFormat('en-GB', { timeStyle: 'medium' }).format(date));
+    $("#dateTime").text(new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(date));
+}
+
+function establishUser()
+{
+    if(serverResponse)
+    {
+        $("#rankText").text(serverResponse.rank);
+        $("#profileDropdown").text(serverResponse.rank);
+        $("#welcomeText").append(serverResponse.displayName + "!");
+    }
+    switch(serverResponse.rank)
+    {
+        case "Merchant":
+            $("#clients").show();
+            $("#sales-merchant").show();
+            break;
+        case "Administrator":
+            $("#products").show();
+            $("#merchants").show();
+            $("#sales-admin").show();
+            break;
+    }
 }
 
 function toggleThemeMode(clicks)
@@ -25,6 +70,9 @@ function toggleThemeMode(clicks)
     $('.list-panel a').toggleClass('dark-grey-text');
 
     $('footer, .card').toggleClass('dark-card-admin');
+    $('#welcomeCard').removeClass('dark-card-admin'); //welcome card should not be darkened
+    $('.blue-gradient').toggleClass('pinot-noir-gradient');
+    $('.calm-darya-gradient').toggleClass('ash-gradient');
     $('body, .navbar').toggleClass('white-skin navy-blue-skin');
     $('#dark-mode').toggleClass('white text-dark btn-outline-black');
     $('body').toggleClass('dark-bg-admin');
