@@ -64,10 +64,17 @@
       background: linear-gradient(to right, #499dfd, #034ec0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
     }
+
+    .flex-wrapper {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+      justify-content: space-between;
+    }
   </style>
 </head>
 
-<body class="fixed-sn white-skin" onload="dashboardPageLoaded()">
+<body class="fixed-sn white-skin flex-wrapper" onload="dashboardPageLoaded()">
 
   <!-- Main Navigation -->
   <header>
@@ -277,19 +284,6 @@
   </main>
   <!-- Main layout -->
 
-  <!-- Footer -->
-  <footer class="page-footer pt-0 mt-5 rgba-stylish-light fixed-bottom wow fadeIn">
-
-    <!-- Copyright -->
-    <div class="footer-copyright py-3 text-center">
-      <div class="container-fluid">
-        TechStore by Marin Tsanov. Dashboard built using <a href="https://mdbootstrap.com" target="_blank">MDBootstrap</a> design kit.
-      </div>
-    </div>
-
-  </footer>
-  <!-- Footer -->
-
   <!-- Bootstrap tooltips -->
   <script type="text/javascript" src="mdb/js/popper.min.js"></script>
   <!-- Bootstrap core JavaScript -->
@@ -332,6 +326,18 @@
     new WOW().init();
   </script>
 
+  <!-- Footer -->
+  <footer class="page-footer pt-0 mt-5 rgba-stylish-light wow fadeIn">
+
+    <!-- Copyright -->
+    <div class="footer-copyright py-3 text-center">
+      <div class="container-fluid">
+        TechStore by Marin Tsanov.
+      </div>
+    </div>
+
+  </footer>
+  <!-- Footer -->
 </body>
 
 </html>
