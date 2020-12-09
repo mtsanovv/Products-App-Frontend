@@ -15,11 +15,11 @@ $.ajax({
             establishUser();
     },
     error: function(xhr) {
-        if(xhr.status == 401)
-            window.location.href = "login.html";
+        window.location.href = "login.html";
     }
 });
 
+//function to take care of setting up UI after the page is ready loading all the assets
 function dashboardPageLoaded() 
 {
     pageLoaded = true;
@@ -35,6 +35,7 @@ function dashboardPageLoaded()
     setInterval(clockUpdate, 1000);
 }
 
+//interval function called to update the clock
 function clockUpdate()
 {
     let date = new Date();
@@ -42,6 +43,7 @@ function clockUpdate()
     $("#dateTime").text(new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(date));
 }
 
+//function to establish the user with a given rank
 function establishUser()
 {
     if(serverResponse)
@@ -64,9 +66,10 @@ function establishUser()
     }
 }
 
+//function to switch between light & dark mode
 function toggleThemeMode(clicks)
 {
-    $('h4, button').not('.check').toggleClass('dark-grey-text text-white');
+    $('h4, button').not('.check, .btn-primary, .btn-default, .btn-secondary, .btn-success, .btn-info, .btn-warning, .btn-danger').toggleClass('dark-grey-text text-white');
     $('.list-panel a').toggleClass('dark-grey-text');
 
     $('footer, .card').toggleClass('dark-card-admin');
