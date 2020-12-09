@@ -275,7 +275,7 @@ function showProductsListing(result)
         for (const [key, element] of Object.entries(row))
             toAppend += "<td>" + element + "</td>";
 
-        toAppend += "<td><a href='edit.html?product=" + row.id + "'><button class='btn btn-primary btn-rounded waves-effect waves-light'>Edit</button></a> <button class='btn btn-rounded btn-danger waves-effect waves-light' onclick='deleteProduct(" + row.id + ")'>Delete</button></td>";
+        toAppend += "<td><a href='edit.html?product=" + row.id + "'><button class='btn btn-outline-primary btn-rounded waves-effect waves-light'>Edit</button></a> <button class='btn btn-rounded btn-outline-danger waves-effect waves-light' onclick='deleteProduct(" + row.id + ")'>Delete</button></td>";
         toAppend += "</tr>";
         $("#productsTableRows").append(toAppend);
     });
