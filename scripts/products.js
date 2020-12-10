@@ -103,7 +103,12 @@ function toggleThemeMode(clicks)
 //function to create the data table
 function createDataTable()
 {
-    let table = $('#productsListingTable').DataTable();
+    let table = $('#productsListingTable').DataTable({
+        "columnDefs": [ {
+            "targets": [ 5 ],
+            "orderable": false
+         } ]
+    });
     $('#productsListingTable_wrapper').find('label').each(function () {
         $(this).parent().append($(this).children());
     });
@@ -170,7 +175,20 @@ function addProduct()
 
     $('input').each(function(index, item) {
         if(item.checkValidity())
+        {
             inputValidationsPassed++;
+            $("#" + item.id).removeClass("invalid");
+            $("#" + item.id).removeClass("valid");
+            $("#" + item.id).focusin();
+            $("#" + item.id).addClass("valid");
+        }
+        else
+        {
+            $("#" + item.id).removeClass("invalid");
+            $("#" + item.id).removeClass("valid");
+            $("#" + item.id).focusin();
+            $("#" + item.id).addClass("invalid");
+        }
     });
 
     if(inputValidationsPassed === $('input').length)
@@ -259,23 +277,23 @@ function saveProduct(productId)
 //function to show the products listing
 function showProductsListing(result)
 {
-    const columnHeaders = ["ID", "Name", "Quantity", "Critical quantity", "Price per item (BGN)", "Actions"];
+    const columnHeaders = ["ID", "Name", "Quantity", "Critical quantity", "Price per item (USD)", "Actions"];
 
     $("#errorMessage").hide();
     $("#productsListing").show();
 
     columnHeaders.forEach((header) => {
-        $("#productsTableHeaders").append("<th>" + header + "</th>");
-        $("#productsTableFooters").append("<th>" + header + "</th>");
+        $("#productsTableHeaders").append("<th class='text-center'>" + header + "</th>");
+        $("#productsTableFooters").append("<th class='text-center'>" + header + "</th>");
     });
 
     result.forEach((row) => {
         let toAppend = "<tr>";
 
         for (const [key, element] of Object.entries(row))
-            toAppend += "<td>" + element + "</td>";
+            toAppend += "<td class='text-center'>" + element + "</td>";
 
-        toAppend += "<td><a href='edit.html?product=" + row.id + "'><button class='btn btn-outline-primary btn-rounded waves-effect waves-light'>Edit</button></a> <button class='btn btn-rounded btn-outline-danger waves-effect waves-light' onclick='deleteProduct(" + row.id + ")'>Delete</button></td>";
+        toAppend += "<td class='text-center'><a href='edit.html?product=" + row.id + "'><button class='btn btn-outline-primary btn-rounded waves-effect waves-light'>Edit</button></a> <button class='btn btn-rounded btn-outline-danger waves-effect waves-light' onclick='deleteProduct(" + row.id + ")'>Delete</button></td>";
         toAppend += "</tr>";
         $("#productsTableRows").append(toAppend);
     });
