@@ -117,10 +117,10 @@ function toggleThemeMode(clicks)
     $('#welcomeCard').removeClass('dark-card-admin'); //welcome card should not be darkened
     $('.blue-gradient').toggleClass('pinot-noir-gradient');
     $('.calm-darya-gradient').toggleClass('ash-gradient');
-    $('body, .navbar').toggleClass('white-skin navy-blue-skin');
+    $('body, .navbar, .modal-content').toggleClass('white-skin navy-blue-skin');
     $('#dark-mode').toggleClass('white text-dark btn-outline-black');
-    $('body').toggleClass('dark-bg-admin');
-    $('h6, .card, p, td, th, i, li a, h4, input, label').not(
+    $('body, .modal-content').toggleClass('dark-bg-admin');
+    $('h6, .card, p, td, th, i, li a, h4, input, label, h5').not(
         '#slide-out i, #slide-out a, .dropdown-item i, .dropdown-item, .btn-secondary').toggleClass('text-white');
     $('.btn-dash').toggleClass('grey blue').toggleClass('lighten-3 darken-3');
     $('.gradient-card-header').toggleClass('white black lighten-4');
@@ -312,10 +312,18 @@ function showProductsListing(result)
         for (const [key, element] of Object.entries(row))
             toAppend += "<td class='text-center'>" + element + "</td>";
 
-        toAppend += "<td class='text-center'><a href='edit.html?product=" + row.id + "'><button class='btn btn-outline-primary btn-rounded waves-effect waves-light'>Edit</button></a> <button class='btn btn-rounded btn-outline-danger waves-effect waves-light' onclick='deleteProduct(" + row.id + ")'>Delete</button></td>";
+        toAppend += "<td class='text-center'><a href='edit.html?product=" + row.id + "'><button class='btn btn-outline-primary btn-rounded waves-effect waves-light'>Edit</button></a> <button class='btn btn-rounded btn-outline-danger waves-effect waves-light' data-toggle='modal' data-target='#deleteModal' onclick='changeProductDeleteModal(" + row.id + ", \"" + row.name + "\")'>Delete</button></td>";
         toAppend += "</tr>";
         $("#productsTableRows").append(toAppend);
     });
+}
+
+//function to change what the delete product modal does
+function changeProductDeleteModal(productId, productName)
+{
+    $('#deleteModalLongTitle').html("Deleting <b>" + productName + "</b>");
+    $('#deleteModalBody').html("Are you sure that you want to delete the product <b>" + productName + "</b>? <p class='mt-2'><b>This operation will delete any linked sales with this product, so proceed with caution.</b></p>");
+    $('#modalConfirmDeletion').attr("onclick", "deleteProduct(" + productId + ")");
 }
 
 //showing errors for products

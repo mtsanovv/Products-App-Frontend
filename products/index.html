@@ -254,7 +254,7 @@
             <div id="productsListing" class="row mt-md-4 pt-md-2 mb-5 mx-4">
 
                 <!-- Grid column -->
-                <div class="col-md-12">
+                <div class="col-md-12 table-responsive">
                     <table id="productsListingTable" class="table table-hover" cellspacing="0" width="100%">
                         <thead>
                             <tr id="productsTableHeaders" class="calm-darya-gradient text-white">
@@ -280,6 +280,31 @@
 
       </section>
 
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalCenterTitle" aria-hidden="true">
+
+      <!-- Add .modal-dialog-centered to .modal-dialog to vertically center the modal -->
+      <div class="modal-dialog modal-dialog-centered" role="document">
+
+
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLongTitle">Deleting a product</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><p>&times;</p></span>
+            </button>
+          </div>
+          <p class="modal-body" id="deleteModalBody">
+            Are you sure that you want to delete?
+          </p>
+          <div class="modal-footer">
+            <button id="modalConfirmDeletion" type="button" onclick="" class="btn btn-rounded btn-outline-danger waves-effect waves-light">Confirm Deletion</button>
+            <button type="button" class="btn btn-rounded btn-outline-primary waves-effect waves-light" data-dismiss="modal">Cancel deletion</button>
+          </div>
+        </div>
+      </div>
     </div>
 
   </main>

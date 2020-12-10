@@ -76,11 +76,11 @@ function toggleThemeMode(clicks)
     $('#welcomeCard').removeClass('dark-card-admin'); //welcome card should not be darkened
     $('.blue-gradient').toggleClass('pinot-noir-gradient');
     $('.calm-darya-gradient').toggleClass('ash-gradient');
-    $('body, .navbar').toggleClass('white-skin navy-blue-skin');
+    $('body, .navbar, .modal-content').toggleClass('white-skin navy-blue-skin');
     $('#dark-mode').toggleClass('white text-dark btn-outline-black');
-    $('body').toggleClass('dark-bg-admin');
-    $('h6, .card, p, td, th, i, li a, h4, input, label').not(
-        '#slide-out i, #slide-out a, .dropdown-item i, .dropdown-item').toggleClass('text-white');
+    $('body, .modal-content').toggleClass('dark-bg-admin');
+    $('h6, .card, p, td, th, i, li a, h4, input, label, h5').not(
+        '#slide-out i, #slide-out a, .dropdown-item i, .dropdown-item, .btn-secondary').toggleClass('text-white');
     $('.btn-dash').toggleClass('grey blue').toggleClass('lighten-3 darken-3');
     $('.gradient-card-header').toggleClass('white black lighten-4');
     $('.list-panel a').toggleClass('navy-blue-bg-a text-white').toggleClass('list-group-border');
