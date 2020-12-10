@@ -65,7 +65,10 @@ function productsPageLoaded(pageName)
                 crossDomain: true,
                 url: APIConfig.host + '/products/' + getUrlParameter("product"),
                 success: function (result) {
-                    document.title = "Editing product '" + result.name + "'";
+                    $('input').each(function(index, item) {
+                        $("#" + item.id).focusin();
+                    });
+                    document.title = "Editing product '" + result.name + "' | TechStore Dashboard";
                     $("#editingPageTitle").text("Editing product '" + result.name + "'");
                     $("#name").val(result.name);
                     $("#quantity").val(result.quantity);
@@ -244,7 +247,20 @@ function saveProduct(productId)
 
     $('input').each(function(index, item) {
         if(item.checkValidity())
+        {
             inputValidationsPassed++;
+            $("#" + item.id).removeClass("invalid");
+            $("#" + item.id).removeClass("valid");
+            $("#" + item.id).focusin();
+            $("#" + item.id).addClass("valid");
+        }
+        else
+        {
+            $("#" + item.id).removeClass("invalid");
+            $("#" + item.id).removeClass("valid");
+            $("#" + item.id).focusin();
+            $("#" + item.id).addClass("invalid");
+        }
     });
 
     if(inputValidationsPassed === $('input').length)
