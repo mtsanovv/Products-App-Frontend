@@ -28,7 +28,7 @@ $.ajax({
 });
 
 //function to fetch all products from the Rest API and perform some user-specific operations
-function productsIndexPageLoaded()
+function productsPageLoaded(pageName)
 {
     pageLoaded = true;
     //switch to the theme mode accordingly
@@ -39,19 +39,49 @@ function productsIndexPageLoaded()
     if(serverResponse)
         establishUser();
 
-    $.ajax({
-        type: 'GET',
-        xhrFields: {
-            withCredentials: true
-        },
-        crossDomain: true,
-        url: APIConfig.host + '/products',
-        success: function(result) {
-            showProductsListing(result);
-            createDataTable();
-        },
-        error: showProductsError
-    });
+    switch(pageName)
+    {
+        case "listing":
+            $.ajax({
+                type: 'GET',
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                url: APIConfig.host + '/products',
+                success: function(result) {
+                    showProductsListing(result);
+                    createDataTable();
+                },
+                error: showProductsError
+            });
+            break;
+        case "editing":
+            $.ajax({
+                type: 'GET',
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                url: APIConfig.host + '/products/' + getUrlParameter("product"),
+                success: function (result) {
+                    document.title = "Editing product '" + result.name + "'";
+                    $("#editingPageTitle").text("Editing product '" + result.name + "'");
+                    $("#name").val(result.name);
+                    $("#quantity").val(result.quantity);
+                    $("#criticalQuantity").val(result.criticalQuantity);
+                    $("#pricePerItem").val(result.pricePerItem);
+                    $("#saveChanges").attr("onclick", "saveProduct(" + result.id + ")");
+                },
+                error: function(xhr, status, code) {
+                    showProductsError(xhr, status, code);
+                    $("#saveChanges").hide();
+                    $("#cancelEditing").hide();
+                }
+            });
+            break;
+
+    }
 }
 
 //function to establish the user with their rank
@@ -139,33 +169,6 @@ function darkModeSwitchTextCompletely()
     if(getCookie("techstoreDashboardMode") == "dark")
         $('h6, .card, p, td, th, i, li a, h4, input, label').not(
             '#slide-out i, #slide-out a, .dropdown-item i, .dropdown-item, .text-white, .btn-secondary').toggleClass('text-white');
-}
-
-//setting up the product editing page
-function editingPageLoaded()
-{
-    $.ajax({
-        type: 'GET',
-        xhrFields: {
-            withCredentials: true
-        },
-        crossDomain: true,
-        url: APIConfig.host + '/products/' + getUrlParameter("product"),
-        success: function (result) {
-            document.title = "Editing product '" + result.name + "'";
-            $("#editingPageTitle").text("Editing product '" + result.name + "'");
-            $("#name").val(result.name);
-            $("#quantity").val(result.quantity);
-            $("#criticalQuantity").val(result.criticalQuantity);
-            $("#pricePerItem").val(result.pricePerItem);
-            $("#saveChanges").attr("onclick", "saveProduct(" + result.id + ")");
-        },
-        error: function(xhr, status, code) {
-            showProductsError(xhr, status, code);
-            $("#saveChanges").hide();
-            $("#cancelEditing").hide();
-        }
-    });
 }
 
 //function to send a POST request to add the product
