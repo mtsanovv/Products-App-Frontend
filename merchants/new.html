@@ -1,37 +1,363 @@
 <!DOCTYPE html>
-<head>
-    <meta charset="UTF-8">
-    <title>Add a product</title>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-    <script src="../scripts/config.js"></script>
-    <script src="../scripts/merchants.js"></script>
-</head>
-<body style="text-align: center;">
-    <h1>Add a merchant</h1>
-    <h4 id="errorMessage"></h4>
-    <table>
-        <thead>
-            <tr>
-                <th>Username (up to 128 characters)</th>
-                <th>Display name (up to 1024 characters)</th>
-                <th>Password (between 8 and 50 characters)</th>
-            </tr>
-        </thead>
+<html lang="en">
 
-        <tbody>
-            <tr>
-                <td>
-                    <input id="username" name="username" type="text" pattern="^.{1,128}$" style="width: 90%;" required></input>
-                </td>
-                <td>
-                    <input id="displayName" name="displayName" type="text" pattern="^.{1,1024}$" style="width: 90%;" required></input>
-                </td>
-                <td>
-                    <input id="password" name="password" type="password" pattern="^.{8,50}$" style="width: 90%;" required></input>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <button onclick="addMerchant()">Submit</button> <a href="index.html"><button>Cancel adding</button></a>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Add a Merchant | TechStore Dashboard</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="../mdb/css/bootstrap.min.css">
+  <!-- Material Design Bootstrap -->
+  <link rel="stylesheet" href="../mdb/css/mdb.min.css">
+
+  <!-- SCRIPTS -->
+  <!-- JQuery -->
+  <script src="../mdb/js/jquery-3.4.1.min.js"></script>
+  <!-- More scripts after the footer -->
+  <!-- REST API Config -->
+  <script src="../scripts/config.js"></script>
+  <!-- Cookie functions -->
+  <script src="../scripts/cookies.js"></script>
+  <!-- Dashboard page script -->
+  <script src="../scripts/merchants.js"></script>
+  <!-- Cookie consent -->
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.10/cookieconsent.min.js"></script>
+  <script type="text/javascript">
+    window.cookieconsent_options = {"message":"This website uses cookies to improve your experience.","dismiss":"Got It","learnMore":"Learn More","link":"https://cookie-consent.app.forthe.top/why-websites-use-cookies/","target": "_blank", "theme":"light-bottom"};
+  </script> 
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon-16x16.png">
+  <link rel="manifest" href="../assets/images/site.webmanifest">
+
+  <!-- Custom styles -->
+  <style>
+    .sn-bg-techstore {
+      background-image: url("../assets/images/navbg.jpg");
+    }
+
+    .navbar {
+      transition: background 0s linear, padding 0s linear !important;
+    }
+
+    #products, #merchants, #clients, #sales-admin, #sales-merchant {
+      display: none;
+    }
+
+    .ash-gradient {
+      background: linear-gradient(to left, #3f4c6b, #606c88) !important; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+
+    .pinot-noir-gradient {
+      background: linear-gradient(to left, #182848, #4b6cb7) !important; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    }
+
+    .calm-darya-gradient {
+      background: linear-gradient(to right, #499dfd, #034ec0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    }
+
+    .flex-wrapper {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+
+<body class="fixed-sn white-skin flex-wrapper" onload="merchantsPageLoaded()">
+
+  <!-- Main Navigation -->
+  <header>
+
+    <!-- Sidebar navigation -->
+    <div id="slide-out" class="side-nav sn-bg-techstore fixed">
+      <ul class="custom-scrollbar">
+
+        <!-- Logo -->
+        <li class="logo-sn waves-effect py-3">
+          <div class="text-center">
+            <a href="../dashboard.html" class="pl-0"><img height="100%" src="../assets/images/apple-touch-icon.png"></a>
+          </div>
+        </li>
+
+        <!-- Side navigation links -->
+        <li>
+          <ul class="collapsible collapsible-accordion">
+
+            <li id="products">
+              <a class="collapsible-header waves-effect arrow-r">
+                <i class="w-fa fas fa-shopping-bag"></i>Products<i class="fas fa-angle-down rotate-icon"></i>
+                </a>
+                <div class="collapsible-body">
+                  <ul>
+                    <li>
+                      <a href="../products" class="waves-effect">All products</a>
+                    </li>
+                    <li>
+                      <a href="../products/new.html" class="waves-effect">Add a product</a>
+                    </li>
+                  </ul>
+                </div>
+            </li>
+
+            <li id="merchants">
+              <a class="collapsible-header waves-effect arrow-r active">
+                <i class="w-fa fas fa-user-friends"></i>Merchants<i class="fas fa-angle-down rotate-icon"></i>
+                </a>
+                <div class="collapsible-body" style="display: block;">
+                  <ul>
+                    <li>
+                      <a href="../merchants" class="waves-effect">All merchants</a>
+                    </li>
+                    <li>
+                      <a href="../merchants/new.html" class="waves-effect active">Add a merchant</a>
+                    </li>
+                  </ul>
+                </div>
+            </li>
+
+            <li id="clients">
+              <a class="collapsible-header waves-effect arrow-r">
+                <i class="w-fa fas fa-user-tag"></i>Clients<i class="fas fa-angle-down rotate-icon"></i>
+                </a>
+                <div class="collapsible-body">
+                  <ul>
+                    <li>
+                      <a href="../clients" class="waves-effect">All clients</a>
+                    </li>
+                    <li>
+                      <a href="../clients/new.html" class="waves-effect">Add a client</a>
+                    </li>
+                  </ul>
+                </div>
+            </li>
+
+            <li id="sales-admin">
+              <a href="../sales" class="collapsible-header waves-effect"><i class="w-fa fas fa-dollar-sign"></i>Sales</a>
+            </li>
+
+            <li id="sales-merchant">
+              <a class="collapsible-header waves-effect arrow-r">
+                <i class="w-fa fas fa-hand-holding-usd"></i>Sales<i class="fas fa-angle-down rotate-icon"></i>
+                </a>
+                <div class="collapsible-body">
+                  <ul>
+                    <li>
+                      <a href="../sales" class="waves-effect">My sales</a>
+                    </li>
+                    <li>
+                      <a href="../sales/new.html" class="waves-effect">Sell a product</a>
+                    </li>
+                  </ul>
+                </div>
+            </li>
+            
+          </ul>
+        </li>
+        <!-- Side navigation links -->
+
+      </ul>
+      <div class="sidenav-bg mask-strong"></div>
+    </div>
+    <!-- Sidebar navigation -->
+
+    <!-- Navbar -->
+    <nav class="navbar fixed-top navbar-expand-lg scrolling-navbar double-nav">
+
+      <!-- SideNav slide-out button -->
+      <div class="float-left">
+        <a href="#" data-activates="slide-out" class="button-collapse"><i class="fas fa-bars"></i></a>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb-dn mr-auto">
+        <p>TechStore Dashboard</p>
+      </div>
+
+      <div class="d-flex change-mode">
+
+        <div class="ml-auto mb-0 mr-3 change-mode-wrapper">
+          <button class="btn btn-outline-black btn-sm" id="dark-mode">Change Mode</button>
+        </div>
+
+        <!-- Navbar links -->
+        <ul class="nav navbar-nav nav-flex-icons ml-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle waves-effect" href="#" id="userDropdown" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              <i class="fas fa-user"></i> <span id="profileDropdown" class="clearfix d-none d-sm-inline-block">Profile</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+              <a class="dropdown-item" href="../logout.html">Log Out</a>
+            </div>
+          </li>
+
+        </ul>
+        <!-- Navbar links -->
+
+      </div>
+
+    </nav>
+    <!-- Navbar -->
+
+
+  </header>
+  <!-- Main Navigation -->
+
+  <!-- Main layout -->
+  <main>
+
+    <div class="container-fluid wow fadeIn">
+
+      <!-- Section: Merchants Panel -->
+      <section class="mt-md-4 pt-md-2 mb-5">
+
+        <!-- Card -->
+        <div class="card card-cascade narrower">
+
+          <!-- Section: Merchants data -->
+          <section>
+
+            <!-- Grid row -->
+            <div class="row">
+
+              <!-- Grid column -->
+              <div class="col-xl-5 col-md-12 mr-0">
+
+                <!-- Card header -->
+                <div class="view view-cascade gradient-card-header blue-gradient">
+                  <h2 class="h2-responsive mb-0 font-weight-bold">Add a merchant</h2>
+                </div>
+                <!-- Card header -->
+
+              </div>
+
+            </div>
+
+            <!-- Grid row -->
+            <div class="row">
+                <div class="alert alert-danger my-4 col-md-10 offset-md-1" id="errorMessage" role="alert" style="text-align: center; display: none;"></div>
+            </div>
+
+            <!-- Grid row -->
+            <div class="row mb-5 mx-4">
+
+                <!-- Grid column -->
+                <div class="col-md-4">
+                    <div class="md-form mt-5">
+                        <i class="fas fa-user prefix"></i>
+                        <input id="username" name="username" type="text" pattern="^.{1,128}$" class="form-control validate" required></input>
+                        <label for="username" data-error="between 1 and 128 characters" data-success="valid">Merchant username</label>
+                    </div>
+                </div>
+                <!-- Grid column -->
+
+                <!-- Grid column -->
+                <div class="col-md-4">
+                    <div class="md-form mt-5">
+                        <i class="fas fa-user-tag prefix"></i>
+                        <input id="displayName" name="displayName" type="text" pattern="^.{1,1024}$" class="form-control validate" required></input>
+                        <label for="displayName" data-error="between 1 and 1024 characters" data-success="valid">Merchant display name</label>
+                    </div>
+                </div>
+                <!-- Grid column -->
+
+                <!-- Grid column -->
+                <div class="col-md-4">
+                    <div class="md-form mt-5">
+                        <i class="fas fa-key prefix"></i>
+                        <input id="password" name="password" type="password" pattern="^.{8,50}$" class="form-control validate" required></input>
+                        <label for="password" data-error="between 8 and 50 characters" data-success="valid">Merchant password</label>
+                    </div>
+                </div>
+                <!-- Grid column -->
+
+            </div>
+            <!-- Grid row -->
+
+            <!-- Grid row -->
+            <div class="row mb-5 mx-4">
+                <!-- Grid column -->
+                <div class="col-md-12">
+                    <div class="text-center">
+                        <button class='btn btn-outline-success btn-rounded waves-effect waves-light' onclick="addMerchant()">Submit</button> <a href="index.html"><button class='btn btn-rounded btn-outline-danger waves-effect waves-light'>Cancel adding</button></a>
+                    </div>
+                </div>
+                <!-- Grid column -->
+            </div>
+            
+          </section>
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+  <!-- Main layout -->
+
+  <!-- Bootstrap tooltips -->
+  <script type="text/javascript" src="../mdb/js/popper.min.js"></script>
+  <!-- Bootstrap core JavaScript -->
+  <script type="text/javascript" src="../mdb/js/bootstrap.js"></script>
+  <!-- MDB core JavaScript -->
+  <script type="text/javascript" src="../mdb/js/mdb.min.js"></script>
+  <!-- Initializations -->
+  <script>
+    // SideNav Initialization
+    $(".button-collapse").sideNav();
+
+    var container = document.querySelector('.custom-scrollbar');
+    var ps = new PerfectScrollbar(container, {
+      wheelSpeed: 2,
+      wheelPropagation: true,
+      minScrollbarLength: 20
+    });
+
+    // Data Picker Initialization
+    $('.datepicker').pickadate();
+
+    // Material Select Initialization
+    $(document).ready(function () {
+      $('.mdb-select').material_select();
+    });
+
+    // Tooltips Initialization
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+
+    // Dark mode
+    $(function () {
+      $('#dark-mode').on('click', function (e) {
+        e.preventDefault();
+        toggleThemeMode(true);
+      });
+    });
+
+    new WOW().init();
+  </script>
+
+  <!-- Footer -->
+  <footer class="page-footer pt-0 mt-5 rgba-stylish-light wow fadeIn">
+
+    <!-- Copyright -->
+    <div class="footer-copyright py-3 text-center">
+      <div class="container-fluid">
+        TechStore by Marin Tsanov.
+      </div>
+    </div>
+
+  </footer>
+  <!-- Footer -->
 </body>
+
 </html>
