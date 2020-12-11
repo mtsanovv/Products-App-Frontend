@@ -47,7 +47,7 @@ function attemptLogin()
     if(inputValidationsPassed === $('input').length)
     {
         $.ajax({
-            type: 'GET',
+            type: 'POST',
             url: APIConfig.host + '/user',
             xhrFields: {
                 withCredentials: true
