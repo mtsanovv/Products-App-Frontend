@@ -15,12 +15,15 @@ $.ajax({
             establishUser();
     },
     error: function(xhr) {
-        window.location.href = "login.html";
+        if(xhr.status == 401)
+            window.location.href = "login.html";
+        else 
+            window.location.href = "dashboard.html";
     }
 });
 
-//function to take care of setting up UI after the page is ready loading all the assets
-function dashboardPageLoaded() 
+//function called when the tweet page has loaded
+function tweetPageLoaded()
 {
     pageLoaded = true;
     //switch to the theme mode accordingly
@@ -30,34 +33,19 @@ function dashboardPageLoaded()
     //establish an authenticated user
     if(serverResponse)
         establishUser();
-
-    clockUpdate();
-    setInterval(clockUpdate, 1000);
 }
 
-//interval function called to update the clock
-function clockUpdate()
-{
-    let date = new Date();
-    $("#clockTime").text(new Intl.DateTimeFormat('en-GB', { timeStyle: 'medium' }).format(date));
-    $("#dateTime").text(new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(date));
-}
-
-//function to establish the user with a given rank
+//function to establish the user with their rank
 function establishUser()
 {
     if(serverResponse)
-    {
-        $("#rankText").text(serverResponse.rank);
         $("#profileDropdown").text(serverResponse.rank);
-        $("#welcomeText").append(serverResponse.displayName + "!");
-    }
+
     switch(serverResponse.rank)
     {
         case "Merchant":
             $("#clients").show();
             $("#sales-merchant").show();
-            $("#tweetBtn").show();
             break;
         case "Administrator":
             $("#products").show();
@@ -80,7 +68,7 @@ function toggleThemeMode(clicks)
     $('body, .navbar, .modal-content').toggleClass('white-skin navy-blue-skin');
     $('#dark-mode').toggleClass('white text-dark btn-outline-black');
     $('body, .modal-content').toggleClass('dark-bg-admin');
-    $('h6, .card, p, td, th, i, li a, h4, input, label, h5').not(
+    $('h6, .card, p, td, th, i, li a, h4, input, label, h5, textarea').not(
         '#slide-out i, #slide-out a, .dropdown-item i, .dropdown-item, .btn-secondary').toggleClass('text-white');
     $('.btn-dash').toggleClass('grey blue').toggleClass('lighten-3 darken-3');
     $('.gradient-card-header').toggleClass('white black lighten-4');
@@ -91,4 +79,59 @@ function toggleThemeMode(clicks)
 
     else if(clicks && (getCookie("techstoreDashboardMode") == "dark"))
         setCookie("techstoreDashboardMode", "bright", 365);
+}
+
+//function to POST a text to be tweeted by the backend
+function tweet()
+{
+    $("#loader").show();
+    $("#tweetBtn").hide();
+    $("#cancelBtn").hide();
+
+    const dataToBeSent = {
+        text: document.getElementById("text").value
+    };
+
+    $.ajax({
+        type: 'POST',
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
+        url: APIConfig.host + '/user/tweet',
+        data: JSON.stringify(dataToBeSent),
+        contentType: "application/json",
+        success: function (result) {
+            console.log(result);
+            $("#loader").hide();
+            $("#tweetBtn").hide();
+            $("#cancelBtn").show();
+            $("#tweetArea").hide();
+            $("#cancelBtn").text("Back to dashboard");
+            $("#errorMessage").removeClass("alert-danger");
+            $("#errorMessage").addClass("alert-success");
+            $("#errorMessage").html("Tweet posted successfully to <a href='https://twitter.com/" + result.user.screenName + "' target='_blank'>@" + result.user.screenName + "</a> timeline: <p class='mt-2 mb-0'>" + result.text + "</p>");
+            $("#errorMessage").show();
+        },
+        error: showTweetError
+    });
+}
+
+//showing errors for tweet
+function showTweetError(xhr, status, error)
+{
+    $("#loader").hide();
+    $("#tweetBtn").show();
+    $("#cancelBtn").show();
+
+    $("#errorMessage").show();
+
+    $("#errorMessage").html("");
+
+    if(xhr.status == 401)
+        window.location.href = "login.html";
+    else if(xhr.status == 403)
+        window.location.href = "dashboard.html";
+    else
+        $("#errorMessage").append(JSON.parse(xhr.responseText).message);
 }
