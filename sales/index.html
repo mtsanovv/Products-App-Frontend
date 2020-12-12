@@ -251,6 +251,75 @@
             </div>
             <!-- Grid row -->
 
+
+            <!-- Grid row -->
+            <div id="filtering" style="display: none;" class="row mx-4 my-4">
+                <!-- Grid column -->
+                <div class="col-md-3">
+                    <div class="md-form">
+                        <input type="text" id="startDatePicker" placeholder="Select a start date" class="form-control datepicker">
+                        <label for="startDatePicker" class="active">Start date</label>
+                    </div>
+                </div>
+                <!-- Grid column -->
+
+                <!-- Grid column -->
+                <div class="col-md-3">
+                    <div class="md-form">
+                        <input type="text" id="endDatePicker" placeholder="Select an end date" class="form-control datepicker">
+                        <label for="endDatePicker" class="active">End date</label>
+                    </div>
+                </div>
+                <!-- Grid column -->
+
+                <!-- Grid column -->
+                <div class="col-md-3 text-center">
+                    <!--Dropdown secondary-->
+                    <div class="dropdown">
+                        <!--Trigger-->
+                        <button class="btn btn-outline-info btn-rounded dropdown-toggle" type="button" id="dropdownMenu2-1"
+                        data-toggle="dropdown">Pick a merchant</button>
+                    
+                        <!--Menu-->
+                        <div class="dropdown-menu dropdown-info" id="merchantPicker">
+                            <!-- Search form -->
+                            <div class="md-form">
+                                <input id="dropdownSearch" class="form-control" type="text" placeholder="Search" aria-label="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <!--/Dropdown secondary-->
+                </div>
+                <!-- Grid column -->
+
+                <!-- Grid column -->
+                <div class="col-md-3 text-center">
+                    <!-- Spinning material loader -->
+                    <div id="filterLoader" class="preloader-wrapper small active mt-2" style="display: none;">
+                        <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                        </div>
+                    </div>
+                    <!-- Filter sales button -->
+                    <button id="filterSales" class="btn btn-outline-primary btn-rounded waves-effect waves-light" onclick="filterSales()" type="button">
+                        Filter sales
+                    </button>
+                    <!-- Filter sales button -->
+                </div>
+                <!-- Grid column -->
+
+            </div>
+            <!-- Grid row -->
+            
+
             <!-- Grid row -->
             <div id="salesListing" class="row mt-md-4 pt-md-2 mb-5 mx-4">
 
@@ -308,8 +377,13 @@
       minScrollbarLength: 20
     });
 
-    // Data Picker Initialization
-    $('.datepicker').pickadate();
+    // Date Picker Initialization
+    $('.datepicker').pickadate({
+        format: 'yyyy-mm-dd',
+        formatSubmit: 'yyyy-mm-dd',
+        min: new Date(1970),
+        max: true
+    });
 
     // Material Select Initialization
     $(document).ready(function () {

@@ -50,6 +50,17 @@ function salesPageLoaded(pageName)
                 },
                 error: showSalesError
             });
+            $.ajax({
+                type: 'GET',
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                url: APIConfig.host + '/merchants',
+                success: function(result) {
+                    addMerchantsToFilter(result);
+                }
+            });
             break;
 
     }
@@ -79,6 +90,79 @@ function establishUser()
     }
 }
 
+
+//function to fetch all merchants - administrators only
+function addMerchantsToFilter(result)
+{
+    let toAppend = "";
+    const anyMerchantOption = "<a id='anyMerchant' class='dropdown-item active text-white' onclick='changeActiveMerchantFilter(\"\", true)'>Any merchant</a>";
+
+    result.forEach((row) => {
+        if(row.sales.length)
+            toAppend += "<a class='dropdown-item' merchantId='" + row.id + "' value='" + row.username + "' onclick='changeActiveMerchantFilter(\"" + row.username + "\", false)'>" + row.username + "</a>";
+    });
+
+    if(toAppend.length)
+    {
+        $("#merchantPicker").append(anyMerchantOption + toAppend);
+        $("#merchantPicker").mdbDropSearch();
+        $("#filtering").show();
+    }
+}
+
+//function to change the active merchant value
+function changeActiveMerchantFilter(merchantUsername, isAny)
+{
+    $('#merchantPicker').find('a').each(function() {
+        if($(this).hasClass('active'))
+            $(this).removeClass('active text-white');
+        if((isAny && $(this).attr('id') == 'anyMerchant') || ($(this).attr('value') === merchantUsername))
+            $(this).addClass('active text-white');
+    });
+}
+
+//function to apply the sales filter
+function filterSales()
+{
+    let queryParameters = {};
+
+    if(document.getElementById('startDatePicker').value)
+        queryParameters.start_date = document.getElementById('startDatePicker').value;
+    
+    if(document.getElementById('endDatePicker').value)
+        queryParameters.end_date = document.getElementById('endDatePicker').value;
+
+    $('#merchantPicker').find('a').each(function() {
+        if($(this).hasClass('active') && $(this).attr('id') != 'anyMerchant')
+        {
+            queryParameters.merchant_id = $(this).attr('merchantId');
+            return false;
+        }
+    });
+
+    const queryString = Object.keys(queryParameters).map(key => key + '=' + queryParameters[key]).join('&');
+    
+    $('#filterSales').hide();
+    $('#filterLoader').show();
+    $.ajax({
+        type: 'GET',
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
+        url: APIConfig.host + '/sales?' + queryString,
+        success: function(result) {
+            showSalesListing(result, true);
+        },
+        error: function(xhr, status, code) {
+            showSalesError(xhr, status, code);
+            $("#salesListing").hide();
+            $('#filterSales').show();
+            $('#filterLoader').hide();
+        }
+    });
+}
+
 //function to switch between light & dark mode
 function toggleThemeMode(clicks)
 {
@@ -93,7 +177,7 @@ function toggleThemeMode(clicks)
     $('#dark-mode').toggleClass('white text-dark btn-outline-black');
     $('body, .modal-content').toggleClass('dark-bg-admin');
     $('h6, .card, p, td, th, i, li a, h4, input, label, h5').not(
-        '#slide-out i, #slide-out a, .dropdown-item i, .dropdown-item, .btn-secondary').toggleClass('text-white');
+        '#slide-out i, #slide-out a, .dropdown-item i, .dropdown-item, .btn-secondary, #dropdownSearch').toggleClass('text-white');
     $('.btn-dash').toggleClass('grey blue').toggleClass('lighten-3 darken-3');
     $('.gradient-card-header').toggleClass('white black lighten-4');
     $('.list-panel a').toggleClass('navy-blue-bg-a text-white').toggleClass('list-group-border');
@@ -140,22 +224,27 @@ function darkModeSwitchTextCompletely()
 {
     if(getCookie("techstoreDashboardMode") == "dark")
         $('h6, .card, p, td, th, i, li a, h4, input, label').not(
-            '#slide-out i, #slide-out a, .dropdown-item i, .dropdown-item, .text-white, .btn-secondary').toggleClass('text-white');
+            '#slide-out i, #slide-out a, .dropdown-item i, .dropdown-item, .text-white, .btn-secondary, #dropdownSearch').toggleClass('text-white');
 }
 
 //function to show the sales listing
-function showSalesListing(result)
+function showSalesListing(result, isRefresh)
 {
     const columnHeaders = ["Product ID", "Product name", "Product quantity", "Critical product quantity", "Price per item (USD)", "Quantity sold", "Date of sale", "Selling price per item (USD)"];
     const ignoreParameters = ["id"];
 
-    $("#errorMessage").hide();
-    $("#salesListing").show();
+    if(!isRefresh)
+    {
+        $("#errorMessage").hide();
+        $("#salesListing").show();
 
-    columnHeaders.forEach((header) => {
-        $("#salesTableHeaders").append("<th class='text-center'>" + header + "</th>");
-        $("#salesTableFooters").append("<th class='text-center'>" + header + "</th>");
-    });
+        columnHeaders.forEach((header) => {
+            $("#salesTableHeaders").append("<th class='text-center'>" + header + "</th>");
+            $("#salesTableFooters").append("<th class='text-center'>" + header + "</th>");
+        });
+    }
+    else
+        $("#salesTableRows").html("");
 
     result.forEach((row) => {
         let toAppend = "<tr>";
@@ -177,6 +266,17 @@ function showSalesListing(result)
         toAppend += "</tr>";
         $("#salesTableRows").append(toAppend);
     });
+
+    if(isRefresh)
+    {
+        $('#productsListingTable').DataTable().ajax.reload();
+        $("#salesListing").show();
+        $('#filterSales').show();
+        $('#filterLoader').hide();
+        $("#errorMessage").hide();
+        $("#errorMessage").html("");
+        darkModeSwitchTextCompletely();
+    }
 }
 
 //showing errors for sales
