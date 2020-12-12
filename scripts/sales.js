@@ -62,6 +62,21 @@ function salesPageLoaded(pageName)
                 }
             });
             break;
+        case "products":
+            $.ajax({
+                type: 'GET',
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                url: APIConfig.host + '/products',
+                success: function(result) {
+                    showProductsListing(result);
+                    createProductsDataTable();
+                },
+                error: showSalesError
+            });
+            break;
 
     }
 }
@@ -226,6 +241,66 @@ function darkModeSwitchTextCompletely()
         $('h6, .card, p, td, th, i, li a, h4, input, label').not(
             '#slide-out i, #slide-out a, .dropdown-item i, .dropdown-item, .text-white, .btn-secondary, #dropdownSearch').toggleClass('text-white');
 }
+
+//function to show products listing on the products page
+//function to show the products listing
+function showProductsListing(result)
+{
+    const columnHeaders = ["ID", "Name", "Quantity", "Critical quantity", "Price per item (USD)", "Actions"];
+
+    $("#errorMessage").hide();
+    $("#productsListing").show();
+
+    columnHeaders.forEach((header) => {
+        $("#productsTableHeaders").append("<th class='text-center'>" + header + "</th>");
+        $("#productsTableFooters").append("<th class='text-center'>" + header + "</th>");
+    });
+
+    result.forEach((row) => {
+        let toAppend = "<tr>";
+
+        for (const [key, element] of Object.entries(row))
+            toAppend += "<td class='text-center'>" + element + "</td>";
+
+        toAppend += "<td class='text-center'><a href='sell.html?product=" + row.id + "'><button class='btn btn-outline-success btn-rounded waves-effect waves-light'>Sell</button></a> <a href='tweet.html?product=" + row.id + "'><button class='btn btn-outline-info btn-rounded waves-effect waves-light'><i class='fab fa-twitter'></i> Tweet Offer</button></a></td>";
+        toAppend += "</tr>";
+        $("#productsTableRows").append(toAppend);
+    });
+}
+
+//function to create the products data table
+function createProductsDataTable()
+{
+    let table = $('#productsListingTable').DataTable({
+        "columnDefs": [ {
+            "targets": [ 5 ],
+            "orderable": false
+         } ]
+    });
+    $('#productsListingTable_wrapper').find('label').each(function () {
+        $(this).parent().append($(this).children());
+    });
+    $('#productsListingTable_wrapper .dataTables_filter').find('input').each(function () {
+        const $this = $(this);
+        $this.attr("placeholder", "Search");
+        $this.removeClass('form-control-sm');
+    });
+    $('#productsListingTable_wrapper .dataTables_length').addClass('d-flex flex-row');
+    $('#productsListingTable_wrapper .dataTables_filter').addClass('md-form');
+    $('#productsListingTable_wrapper select').removeClass(
+    'custom-select custom-select-sm form-control form-control-sm');
+    $('#productsListingTable_wrapper select').addClass('mdb-select');
+    $('#productsListingTable_wrapper .mdb-select').materialSelect();
+    $('#productsListingTable_wrapper .dataTables_filter').find('label').remove();
+
+    //add dark mode to all newly added components as well
+    darkModeSwitchTextCompletely();
+
+    table.on('draw', function (e) {
+        darkModeSwitchTextCompletely();
+    });
+}
+
 
 //function to show the sales listing
 function showSalesListing(result, isRefresh)
