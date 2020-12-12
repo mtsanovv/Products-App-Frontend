@@ -46,6 +46,9 @@ function attemptLogin()
 
     if(inputValidationsPassed === $('input').length)
     {
+        $("#loader").show();
+        $("#loginBtn").hide();
+
         $.ajax({
             type: 'POST',
             url: APIConfig.host + '/user',
@@ -61,6 +64,9 @@ function attemptLogin()
             },
             error: function (xhr, status, error)
             {
+                $("#loader").hide();
+                $("#loginBtn").show();
+        
                 $("#errorMessage").show();
 
                 $("#errorMessage").html("");
