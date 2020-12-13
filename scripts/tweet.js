@@ -102,7 +102,6 @@ function tweet()
         data: JSON.stringify(dataToBeSent),
         contentType: "application/json",
         success: function (result) {
-            console.log(result);
             $("#loader").hide();
             $("#tweetBtn").hide();
             $("#cancelBtn").show();

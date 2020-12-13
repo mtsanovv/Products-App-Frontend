@@ -106,6 +106,32 @@ function salesPageLoaded(pageName)
                 }
             });
             break;
+        case "tweeting":
+            $.ajax({
+                type: 'GET',
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                url: APIConfig.host + '/products/' + getUrlParameter("product"),
+                success: function (result) {
+                    $('input').each(function(index, item) {
+                        if(item.id != "saleQuantity")
+                            $("#" + item.id).focusin();
+                    });
+                    document.title = "Tweeting about '" + result.name + "' | TechStore Dashboard";
+                    $("#tweetingPageTitle").text("Tweeting about '" + result.name + "'");
+                    $("#name").val(result.name);
+                    $("#pricePerItem").val(result.pricePerItem);
+                    $("#tweetProduct").attr("onclick", "tweetProduct(" + result.id + ")");
+                },
+                error: function(xhr, status, code) {
+                    showSalesError(xhr, status, code);
+                    $("#tweetProduct").hide();
+                    $("#cancelTweet").hide();
+                }
+            });
+            break;
     }
 }
 
@@ -131,6 +157,40 @@ function establishUser()
             $("#sales-admin").find("a").first().addClass("active");
             break;
     }
+}
+
+//function to send a POST request to tweet about a product
+function tweetProduct(productId)
+{
+    $("#loader").show();
+    $("#tweetProduct").hide();
+    $("#cancelTweet").hide();
+
+    $.ajax({
+        type: 'POST',
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
+        url: APIConfig.host + '/products/' + productId + '/tweet',
+        success: function (result) {
+            $("#loader").hide();
+            $("#tweetProduct").hide();
+            $("#infoMessage").hide();
+            $("#cancelTweet").show();
+            $("#cancelTweet").text("Back to products");
+            $("#errorMessage").removeClass("alert-danger");
+            $("#errorMessage").addClass("alert-success");
+            $("#errorMessage").html("Tweet posted successfully to <a href='https://twitter.com/" + result.user.screenName + "' target='_blank'>@" + result.user.screenName + "</a> timeline: <p class='mt-2 mb-0'>" + result.text + "</p>");
+            $("#errorMessage").show();
+        },
+        error: function(xhr, status, error) {
+            showSalesError(xhr, status, error);
+            $("#loader").hide();
+            $("#tweetProduct").show();
+            $("#cancelTweet").show();
+        }
+    });
 }
 
 //function to send a POST request to sell a product
