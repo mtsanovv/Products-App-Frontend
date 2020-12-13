@@ -174,6 +174,8 @@ function analyseData(result)
             charts[key].destroy();
     }
 
+    $("#pieChartContainer").html("");
+
     let minDate;
     let maxDate;
     let dates = [];
@@ -300,6 +302,7 @@ function analyseData(result)
             pieChartHoverBackgroundColors.push("#A8B3C5");
         }
 
+        $("#pieChartContainer").html('<canvas id="pieChart" height="100%"></canvas>');
         generateCharts(labelsLineChart, valuesLineChart, labelsPieChart, valuesPieChart, pieChartBackgroundColors, pieChartHoverBackgroundColors);
         
         $("#charts").show();
