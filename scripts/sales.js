@@ -155,6 +155,7 @@ function establishUser()
             $("#merchants").show();
             $("#sales-admin").show();
             $("#sales-admin").find("a").first().addClass("active");
+            $("#sales-admin").find("div").first().show();
             break;
     }
 }
