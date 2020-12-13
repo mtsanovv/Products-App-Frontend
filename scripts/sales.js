@@ -1,6 +1,7 @@
 let pageLoaded = false;
 let serverResponse;
 let table;
+let charts = [];
 
 //check if the user is logged in
 $.ajax({
@@ -38,19 +39,7 @@ function salesPageLoaded(pageName)
     switch(pageName)
     {
         case "listing":
-            $.ajax({
-                type: 'GET',
-                xhrFields: {
-                    withCredentials: true
-                },
-                crossDomain: true,
-                url: APIConfig.host + '/sales',
-                success: function(result) {
-                    showSalesListing(result);
-                    createDataTable();
-                },
-                error: showSalesError
-            });
+            filterSales();
             $.ajax({
                 type: 'GET',
                 xhrFields: {
@@ -132,6 +121,20 @@ function salesPageLoaded(pageName)
                 }
             });
             break;
+        case "analysing":
+            filterSalesAnalysis();
+            $.ajax({
+                type: 'GET',
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                url: APIConfig.host + '/merchants',
+                success: function(result) {
+                    addMerchantsToFilter(result);
+                }
+            });
+            break;
     }
 }
 
@@ -158,6 +161,268 @@ function establishUser()
             $("#sales-admin").find("div").first().show();
             break;
     }
+}
+
+//function to create a chart, depending on the product results it gets passed
+function analyseData(result)
+{
+    //Moments are mutable!
+
+    for(const key of charts)
+    {
+        if(charts[key])
+            charts[key].destroy();
+    }
+
+    let minDate;
+    let maxDate;
+    let dates = [];
+    let lineChart1Data = {0: {}, 1: {}}; //datasets for line charts
+    let mostProductsSold = {}; //pie chart
+    let productNames = {}; //product names for the pie chart
+
+    result.forEach((sale) => {
+        dates.push(moment(sale.dateSold).startOf('day'));
+
+        if(lineChart1Data[0][sale.dateSold])
+            lineChart1Data[0][sale.dateSold] += sale.quantitySold;
+        else
+            lineChart1Data[0][sale.dateSold] = sale.quantitySold;
+
+        if(lineChart1Data[1][sale.dateSold])
+            lineChart1Data[1][sale.dateSold] += sale.quantitySold * sale.priceSold;
+        else
+            lineChart1Data[1][sale.dateSold] = sale.quantitySold * sale.priceSold;
+
+        if(mostProductsSold[sale.product.id])
+            mostProductsSold[sale.product.id] += sale.quantitySold;
+        else
+            mostProductsSold[sale.product.id] = sale.quantitySold;
+
+        if(!productNames[sale.product.id])
+            productNames[sale.product.id] = sale.product.name;
+    });
+
+    const finalLineChartData = sortObjectByKeys(lineChart1Data);
+    const finalPieChartData = Object.entries(mostProductsSold).sort((a, b) => b[1] - a[1]);
+
+    if(document.getElementById('startDatePicker').value)
+        minDate = moment(document.getElementById('startDatePicker').value).startOf('day');
+    else
+        minDate = moment.min(dates);
+
+    if(document.getElementById('endDatePicker').value)
+        maxDate = moment(document.getElementById('endDatePicker').value).endOf('day');
+    else
+        maxDate = moment().endOf('day');
+
+    const dayDifference = Math.ceil(maxDate.diff(minDate, 'days', true));
+
+    if(dayDifference >= 0)
+    {
+        let labelsLineChart = [];
+        let valuesLineChart = [[], []]; //we will have 2 datasets
+        let chartType = 'days';
+        let difference = dayDifference;
+
+        if(dayDifference <= 7)
+        {
+            for(let i = 0; i < dayDifference; i++)
+                labelsLineChart.push(minDate.clone().add(i, 'days').format('YYYY-MM-DD'));
+        }
+        else if(maxDate.diff(minDate, 'weeks', true) > 1 && maxDate.diff(minDate, 'months', true) <= 1)
+        {
+            difference = Math.ceil(maxDate.diff(minDate, 'weeks', true));
+            chartType = 'weeks';
+            for(let i = 0; i < difference; i++)
+                labelsLineChart.push(minDate.clone().add(i, 'weeks').format('[Week] w'));
+        }
+        else if(maxDate.diff(minDate, 'months', true) > 1 && maxDate.diff(minDate, 'years', true) <= 1)
+        {
+            difference = Math.ceil(maxDate.diff(minDate, 'months', true));
+            chartType = 'months';
+            for(let i = 0; i < difference; i++)
+                labelsLineChart.push(minDate.clone().add(i, 'months').format('MMMM YYYY'));
+        }
+        else if(maxDate.diff(minDate, 'years', true) > 1)
+        {
+            difference = Math.ceil(maxDate.diff(minDate, 'years', true));
+            chartType = 'years';
+            for(let i = 0; i < difference; i++)
+                labelsLineChart.push(minDate.clone().add(i, 'years').format('YYYY'));
+        }
+        
+        //iterating for line chart datasets
+        for(let i = 0; i < valuesLineChart.length; i++)
+        {
+            for(let j = 0; j < difference; j++)
+            {
+                let sum = 0;
+                if(chartType == 'days')
+                {
+                    const offsetDate = minDate.clone().add(j, chartType).format('YYYY-MM-DD');
+                    if(finalLineChartData[i][offsetDate])
+                        sum = finalLineChartData[i][offsetDate];
+                }
+                else
+                {
+                    const offsetStartDate = minDate.clone().add(j, chartType);
+                    const offsetEndDate = offsetStartDate.clone().add(1, chartType);
+
+                    for(const key of Object.keys(finalLineChartData[i]))
+                    {
+                        const momentKey = moment(key).startOf('day');
+
+                        if(momentKey.diff(offsetStartDate, chartType, true) >= 0 && offsetEndDate.diff(momentKey, chartType, true) > 0)
+                        {
+                            sum += finalLineChartData[i][key];
+                        }
+                    }
+                }
+                valuesLineChart[i].push(sum);
+            }
+        }
+
+        let otherProductsSum = 0;
+        const bestSellingProduct = finalPieChartData[0][0];
+        for(let i = 1; i < finalPieChartData.length; i++)
+            otherProductsSum += finalPieChartData[i][1];
+
+        let labelsPieChart = [productNames[bestSellingProduct]];
+        let valuesPieChart = [finalPieChartData[0][1]];
+        let pieChartBackgroundColors = ["#E5E5E5"];
+        let pieChartHoverBackgroundColors = ["#FFFFFF"];
+        if(otherProductsSum)
+        {
+            labelsPieChart.push("Other products");
+            valuesPieChart.push(otherProductsSum);
+            pieChartBackgroundColors.push("#949FB1");
+            pieChartHoverBackgroundColors.push("#A8B3C5");
+        }
+
+        generateCharts(labelsLineChart, valuesLineChart, labelsPieChart, valuesPieChart, pieChartBackgroundColors, pieChartHoverBackgroundColors);
+        
+        $("#charts").show();
+    }
+    $('#filterSales').show();
+    $('#filterLoader').hide();
+}
+
+//function to generate the charts
+function generateCharts(labelsLineChart, valuesLineChart, labelsPieChart, valuesPieChart, pieChartBackgroundColors, pieChartHoverBackgroundColors)
+{
+    charts[0] = new Chart(document.getElementById("lineChart0").getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: labelsLineChart,
+          datasets: [{
+            label: "Items sold",
+            fillColor: "#fff",
+            backgroundColor: 'rgba(255, 255, 255, .3)',
+            borderColor: 'rgba(255, 255, 255, .9)',
+            data: valuesLineChart[0],
+          }]
+        },
+        options: {
+          legend: {
+            labels: {
+              fontColor: "#fff",
+            }
+          },
+          scales: {
+            xAxes: [{
+              gridLines: {
+                display: true,
+                color: "rgba(255,255,255,.25)"
+              },
+              ticks: {
+                fontColor: "#fff",
+              },
+            }],
+            yAxes: [{
+              display: true,
+              gridLines: {
+                display: true,
+                color: "rgba(255,255,255,.25)"
+              },
+              ticks: {
+                fontColor: "#fff",
+              },
+            }],
+          }
+        }
+    });
+
+    charts[1] = new Chart(document.getElementById("lineChart1").getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: labelsLineChart,
+          datasets: [{
+            label: "Income (USD)",
+            fillColor: "#fff",
+            backgroundColor: 'rgba(255, 255, 255, .3)',
+            borderColor: 'rgba(255, 255, 255, .9)',
+            data: valuesLineChart[1],
+          }]
+        },
+        options: {
+          legend: {
+            labels: {
+              fontColor: "#fff",
+            }
+          },
+          scales: {
+            xAxes: [{
+              gridLines: {
+                display: true,
+                color: "rgba(255,255,255,.25)"
+              },
+              ticks: {
+                fontColor: "#fff",
+              },
+            }],
+            yAxes: [{
+              display: true,
+              gridLines: {
+                display: true,
+                color: "rgba(255,255,255,.25)"
+              },
+              ticks: {
+                fontColor: "#fff",
+              },
+            }],
+          }
+        }
+    });
+
+    charts[2] = new Chart(document.getElementById("pieChart").getContext('2d'), {
+        type: 'pie',
+        data: {
+          labels: labelsPieChart,
+          datasets: [{
+            data: valuesPieChart,
+            backgroundColor: pieChartBackgroundColors,
+            hoverBackgroundColor: pieChartHoverBackgroundColors
+          }]
+        },
+        options: {
+          legend: {
+            labels: {
+                fontColor: "#fff",
+            }
+          },
+          responsive: true
+        }
+    });
+}
+
+//function to sort object by keys
+function sortObjectByKeys(obj)
+{
+    return Object.keys(obj).sort().reduce(function (result, key) {
+        result[key] = obj[key];
+        return result;
+    }, {});
 }
 
 //function to send a POST request to tweet about a product
@@ -270,6 +535,49 @@ function changeActiveMerchantFilter(merchantUsername, isAny)
     });
 }
 
+//function to apply the sales filter on the analysis page
+function filterSalesAnalysis()
+{
+    let queryParameters = {};
+
+    if(document.getElementById('startDatePicker').value)
+        queryParameters.start_date = document.getElementById('startDatePicker').value;
+    
+    if(document.getElementById('endDatePicker').value)
+        queryParameters.end_date = document.getElementById('endDatePicker').value;
+
+    $('#merchantPicker').find('a').each(function() {
+        if($(this).hasClass('active') && $(this).attr('id') != 'anyMerchant')
+        {
+            queryParameters.merchant_id = $(this).attr('merchantId');
+            return false;
+        }
+    });
+
+    const queryString = Object.keys(queryParameters).map(key => key + '=' + queryParameters[key]).join('&');
+    
+    $("#charts").hide();
+    $('#filterSales').hide();
+    $('#filterLoader').show();
+    $.ajax({
+        type: 'GET',
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true,
+        url: APIConfig.host + '/sales?' + queryString,
+        success: function(result) {
+            analyseData(result);
+        },
+        error: function(xhr, status, code) {
+            showSalesError(xhr, status, code);
+            $("#charts").hide();
+            $('#filterSales').show();
+            $('#filterLoader').hide();
+        }
+    });
+}
+
 //function to apply the sales filter
 function filterSales()
 {
@@ -301,9 +609,7 @@ function filterSales()
         crossDomain: true,
         url: APIConfig.host + '/sales?' + queryString,
         success: function(result) {
-            if(table)
-                table.destroy();
-            showSalesListing(result, true);
+            showSalesListing(result);
             createDataTable();
         },
         error: function(xhr, status, code) {
@@ -420,7 +726,7 @@ function showProductsListing(result)
 //function to create the products data table
 function createProductsDataTable()
 {
-    let table = $('#productsListingTable').DataTable({
+    let productsTable = $('#productsListingTable').DataTable({
         "columnDefs": [ {
             "targets": [ 5 ],
             "orderable": false
@@ -445,15 +751,18 @@ function createProductsDataTable()
     //add dark mode to all newly added components as well
     darkModeSwitchTextCompletely();
 
-    table.on('draw', function (e) {
+    productsTable.on('draw', function (e) {
         darkModeSwitchTextCompletely();
     });
 }
 
 
 //function to show the sales listing
-function showSalesListing(result, isRefresh)
+function showSalesListing(result)
 {
+    if(table)
+        table.destroy();
+    
     const columnHeaders = ["Product ID", "Product name", "Price per item (USD)", "Quantity sold", "Date of sale", "Selling price per item (USD)"];
     const ignoreParameters = ["id"];
     const ignoreProductParameters = ["quantity", "criticalQuantity"];
@@ -494,14 +803,11 @@ function showSalesListing(result, isRefresh)
         $("#salesTableRows").append(toAppend);
     });
 
-    if(isRefresh)
-    {
-        $("#salesListing").show();
-        $('#filterSales').show();
-        $('#filterLoader').hide();
-        $("#errorMessage").hide();
-        $("#errorMessage").html("");
-    }
+    $("#salesListing").show();
+    $('#filterSales').show();
+    $('#filterLoader').hide();
+    $("#errorMessage").hide();
+    $("#errorMessage").html("");
 }
 
 //showing errors for sales
