@@ -1,5 +1,6 @@
 let pageLoaded = false;
 let serverResponse;
+let table;
 
 //check if the user is logged in
 $.ajax({
@@ -77,7 +78,34 @@ function salesPageLoaded(pageName)
                 error: showSalesError
             });
             break;
-
+        case "selling":
+            $.ajax({
+                type: 'GET',
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                url: APIConfig.host + '/products/' + getUrlParameter("product"),
+                success: function (result) {
+                    $('input').each(function(index, item) {
+                        if(item.id != "saleQuantity")
+                            $("#" + item.id).focusin();
+                    });
+                    document.title = "Selling product '" + result.name + "' | TechStore Dashboard";
+                    $("#sellingPageTitle").text("Selling product '" + result.name + "'");
+                    $("#name").val(result.name);
+                    $("#quantity").val(result.quantity);
+                    $("#criticalQuantity").val(result.criticalQuantity);
+                    $("#pricePerItem").val(result.pricePerItem);
+                    $("#sellProduct").attr("onclick", "sellProduct(" + result.id + ")");
+                },
+                error: function(xhr, status, code) {
+                    showSalesError(xhr, status, code);
+                    $("#sellProduct").hide();
+                    $("#cancelSale").hide();
+                }
+            });
+            break;
     }
 }
 
@@ -102,6 +130,51 @@ function establishUser()
             $("#sales-admin").show();
             $("#sales-admin").find("a").first().addClass("active");
             break;
+    }
+}
+
+//function to send a POST request to sell a product
+function sellProduct(productId)
+{
+    if(document.getElementById('saleQuantity').checkValidity())
+    {
+        $("#saleQuantity").removeClass("invalid");
+        $("#saleQuantity").removeClass("valid");
+        $("#saleQuantity").focusin();
+        $("#saleQuantity").addClass("valid");
+    }
+    else
+    {
+        $("#saleQuantity").removeClass("invalid");
+        $("#saleQuantity").removeClass("valid");
+        $("#saleQuantity").focusin();
+        $("#saleQuantity").addClass("invalid");
+    }
+
+    if(document.getElementById('saleQuantity').checkValidity())
+    {
+        const dataToBeSent = {
+            productId: productId,
+            quantitySold: document.getElementById('saleQuantity').value
+        };
+
+        $.ajax({
+            type: 'POST',
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
+            url: APIConfig.host + '/sales',
+            data: JSON.stringify(dataToBeSent),
+            contentType: "application/json",
+            success: function (result) {
+                window.location.href = "products.html"
+            },
+            error: function (xhr, status, error)
+            {
+                showSalesError(xhr, status, error);
+            }
+        });
     }
 }
 
@@ -167,7 +240,10 @@ function filterSales()
         crossDomain: true,
         url: APIConfig.host + '/sales?' + queryString,
         success: function(result) {
+            if(table)
+                table.destroy();
             showSalesListing(result, true);
+            createDataTable();
         },
         error: function(xhr, status, code) {
             showSalesError(xhr, status, code);
@@ -207,8 +283,8 @@ function toggleThemeMode(clicks)
 //function to create the data table
 function createDataTable()
 {
-    let table = $('#salesListingTable').DataTable({
-        "order": [[ 6, "desc" ]]
+    table = $('#salesListingTable').DataTable({
+        "order": [[ 4, "desc" ]]
     });
     $('#salesListingTable_wrapper').find('label').each(function () {
         $(this).parent().append($(this).children());
@@ -242,7 +318,6 @@ function darkModeSwitchTextCompletely()
             '#slide-out i, #slide-out a, .dropdown-item i, .dropdown-item, .text-white, .btn-secondary, #dropdownSearch').toggleClass('text-white');
 }
 
-//function to show products listing on the products page
 //function to show the products listing
 function showProductsListing(result)
 {
@@ -257,12 +332,25 @@ function showProductsListing(result)
     });
 
     result.forEach((row) => {
+        
+        //don't add row to the table if there's nothing left of this product to sell - admins have to restock
+        if(!row.quantity)
+            return;
+        
         let toAppend = "<tr>";
 
         for (const [key, element] of Object.entries(row))
             toAppend += "<td class='text-center'>" + element + "</td>";
 
-        toAppend += "<td class='text-center'><a href='sell.html?product=" + row.id + "'><button class='btn btn-outline-success btn-rounded waves-effect waves-light'>Sell</button></a> <a href='tweet.html?product=" + row.id + "'><button class='btn btn-outline-info btn-rounded waves-effect waves-light'><i class='fab fa-twitter'></i> Tweet Offer</button></a></td>";
+        const sellButton = "<a href='sell.html?product=" + row.id + "'><button class='btn btn-outline-success btn-rounded waves-effect waves-light'>Sell</button></a>";
+        const tweetButton = "<a href='tweet.html?product=" + row.id + "'><button class='btn btn-outline-info btn-rounded waves-effect waves-light'><i class='fab fa-twitter'></i> Tweet Offer</button></a>";
+        
+        //don't tweet offers when the quantity is less than the critical quantity
+        if(row.quantity < row.criticalQuantity)
+            toAppend += "<td class='text-center'>" + sellButton + "</td>";
+        else 
+            toAppend += "<td class='text-center'>" + sellButton + " " + tweetButton + "</td>";
+        
         toAppend += "</tr>";
         $("#productsTableRows").append(toAppend);
     });
@@ -305,21 +393,21 @@ function createProductsDataTable()
 //function to show the sales listing
 function showSalesListing(result, isRefresh)
 {
-    const columnHeaders = ["Product ID", "Product name", "Product quantity", "Critical product quantity", "Price per item (USD)", "Quantity sold", "Date of sale", "Selling price per item (USD)"];
+    const columnHeaders = ["Product ID", "Product name", "Price per item (USD)", "Quantity sold", "Date of sale", "Selling price per item (USD)"];
     const ignoreParameters = ["id"];
+    const ignoreProductParameters = ["quantity", "criticalQuantity"];
 
-    if(!isRefresh)
-    {
-        $("#errorMessage").hide();
-        $("#salesListing").show();
+    $("#errorMessage").hide();
+    $("#salesListing").show();
 
-        columnHeaders.forEach((header) => {
-            $("#salesTableHeaders").append("<th class='text-center'>" + header + "</th>");
-            $("#salesTableFooters").append("<th class='text-center'>" + header + "</th>");
-        });
-    }
-    else
-        $("#salesTableRows").html("");
+    $("#salesTableHeaders").html("");
+    $("#salesTableFooters").html("");
+    $("#salesTableRows").html("");
+
+    columnHeaders.forEach((header) => {
+        $("#salesTableHeaders").append("<th class='text-center'>" + header + "</th>");
+        $("#salesTableFooters").append("<th class='text-center'>" + header + "</th>");
+    });
 
     result.forEach((row) => {
         let toAppend = "<tr>";
@@ -333,7 +421,10 @@ function showSalesListing(result, isRefresh)
                 else
                 {
                     for (const [productKey, productValue] of Object.entries(element))
-                        toAppend += "<td class='text-center'>" + productValue + "</td>";
+                    {
+                        if(ignoreProductParameters.indexOf(productKey) == -1)
+                            toAppend += "<td class='text-center'>" + productValue + "</td>";
+                    }
                 }
             }
         }
@@ -344,13 +435,11 @@ function showSalesListing(result, isRefresh)
 
     if(isRefresh)
     {
-        $('#productsListingTable').DataTable().ajax.reload();
         $("#salesListing").show();
         $('#filterSales').show();
         $('#filterLoader').hide();
         $("#errorMessage").hide();
         $("#errorMessage").html("");
-        darkModeSwitchTextCompletely();
     }
 }
 
