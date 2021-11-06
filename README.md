@@ -15,3 +15,5 @@ Frontend UI for the Java Spring REST app that has to maintain users and products
 
 ## Credits
 - Design created with [Material Design Bootstrap](https://mdbootstrap.com)
+
+*M. Tsanov, 2020*
